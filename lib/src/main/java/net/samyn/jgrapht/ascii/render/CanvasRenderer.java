@@ -7,5 +7,5 @@ import net.samyn.jgrapht.ascii.model.GridVertex;
 public interface CanvasRenderer {
 
   /** Renders a vertex box onto the canvas at the vertex's grid position. */
-  void renderVertex(Canvas canvas, GridVertex vertex);
+  void renderVertex(Canvas canvas, GridVertex<?> vertex);
 }
