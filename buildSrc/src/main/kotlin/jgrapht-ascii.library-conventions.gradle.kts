@@ -4,6 +4,7 @@ import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
 plugins {
     `java-library`
     id("org.jetbrains.kotlinx.kover")
+    id("com.diffplug.spotless")
 }
 
 repositories {
@@ -18,8 +19,17 @@ java {
     withJavadocJar()
 }
 
+spotless {
+    java {
+        googleJavaFormat()
+        target("src/main/java/**/*.java", "src/test/java/**/*.java")
+        endWithNewline()
+    }
+}
+
 tasks.named<JavaCompile>("compileJava") {
     options.release.set(11)
+    dependsOn("spotlessApply")
 }
 
 kover {
