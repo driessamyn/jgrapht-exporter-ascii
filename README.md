@@ -62,6 +62,10 @@ var exporter = new AsciiExporter<String, DefaultEdge>();
 exporter.exportGraph(graph, System.out);
 ```
 
+## Technical Details
+
+*   [Graph Layering Explained](LAYERING.md) - Learn how graph vertices are assigned to layers for visualization.
+
 ## Requirements
 
 - Java 11+
