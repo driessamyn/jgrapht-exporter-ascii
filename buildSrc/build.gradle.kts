@@ -9,4 +9,5 @@ repositories {
 
 dependencies {
     implementation(libs.kover.plugin)
+    implementation("com.diffplug.spotless:com.diffplug.spotless.gradle.plugin:8.2.1")
 }
