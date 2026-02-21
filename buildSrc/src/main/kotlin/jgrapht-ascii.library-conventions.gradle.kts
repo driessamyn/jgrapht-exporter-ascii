@@ -18,7 +18,7 @@ java {
     withJavadocJar()
 }
 
-tasks.withType<JavaCompile>().configureEach {
+tasks.named<JavaCompile>("compileJava") {
     options.release.set(11)
 }
 
