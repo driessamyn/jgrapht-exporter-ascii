@@ -87,8 +87,7 @@ Dummy vertices participate in crossing minimisation and coordinate assignment (t
 but are **excluded** from the final `GridModel<V>` output. The `SplitResult.isDummy()` method identifies which
 vertices to skip during coordinate assignment.
 
-When edge routing is added later (Phase 7), dummy vertex positions will serve as bend points for orthogonal
-edge routes.
+Dummy vertex positions serve as bend points for orthogonal edge routes — see [Edge Routing](EDGE_ROUTING.md).
 
 ### Defence in depth
 

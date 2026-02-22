@@ -1,6 +1,8 @@
 package net.samyn.jgrapht.ascii.render;
 
+import java.util.List;
 import net.samyn.jgrapht.ascii.model.Canvas;
+import net.samyn.jgrapht.ascii.model.GridEdge;
 import net.samyn.jgrapht.ascii.model.GridVertex;
 
 /**
@@ -40,5 +42,68 @@ public class AsciiBoxRenderer implements CanvasRenderer {
       canvas.putChar(x + 1 + i, y + 2, '-');
     }
     canvas.putChar(x + innerWidth + 1, y + 2, '+');
+  }
+
+  @Override
+  public void renderEdge(Canvas canvas, GridEdge<?> edge) {
+    List<int[]> path = edge.path();
+    if (path.size() < 2) {
+      return;
+    }
+
+    // Draw the first waypoint as a junction on the source bottom border
+    int[] first = path.get(0);
+    char existing = canvas.charAt(first[0], first[1]);
+    boolean drewJunction = false;
+    if (existing == '-') {
+      canvas.putChar(first[0], first[1], '+');
+      drewJunction = true;
+    }
+
+    for (int i = 0; i < path.size() - 1; i++) {
+      int x1 = path.get(i)[0];
+      int y1 = path.get(i)[1];
+      int x2 = path.get(i + 1)[0];
+      int y2 = path.get(i + 1)[1];
+
+      if (x1 == x2) {
+        // Vertical segment
+        int minY = Math.min(y1, y2);
+        int maxY = Math.max(y1, y2);
+        for (int y = minY; y <= maxY; y++) {
+          if (drewJunction && i == 0 && y == y1) {
+            continue; // skip — already drawn as junction
+          }
+          canvas.putChar(x1, y, '|');
+        }
+      } else if (y1 == y2) {
+        // Horizontal segment
+        int minX = Math.min(x1, x2);
+        int maxX = Math.max(x1, x2);
+        for (int cx = minX; cx <= maxX; cx++) {
+          if (drewJunction && i == 0 && cx == x1) {
+            continue; // skip — already drawn as junction
+          }
+          canvas.putChar(cx, y1, '-');
+        }
+      }
+    }
+
+    // Draw corners at bend points (where direction changes)
+    for (int i = 1; i < path.size() - 1; i++) {
+      int prevY = path.get(i - 1)[1];
+      int curY = path.get(i)[1];
+      int nextY = path.get(i + 1)[1];
+
+      boolean prevHorizontal = (prevY == curY);
+      boolean nextHorizontal = (curY == nextY);
+      if (prevHorizontal != nextHorizontal) {
+        canvas.putChar(path.get(i)[0], curY, '+');
+      }
+    }
+
+    // Arrow at the last waypoint
+    int[] last = path.get(path.size() - 1);
+    canvas.putChar(last[0], last[1], 'v');
   }
 }

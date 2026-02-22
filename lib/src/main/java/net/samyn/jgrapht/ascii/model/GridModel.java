@@ -13,14 +13,25 @@ import java.util.List;
 public final class GridModel<V> {
 
   private final List<GridVertex<V>> vertices;
+  private final List<GridEdge<V>> edges;
 
   public GridModel(List<GridVertex<V>> vertices) {
+    this(vertices, List.of());
+  }
+
+  public GridModel(List<GridVertex<V>> vertices, List<GridEdge<V>> edges) {
     this.vertices = vertices != null ? List.copyOf(vertices) : List.of();
+    this.edges = edges != null ? List.copyOf(edges) : List.of();
   }
 
   /** Returns the positioned vertices. */
   public List<GridVertex<V>> vertices() {
     return vertices;
+  }
+
+  /** Returns the routed edges. */
+  public List<GridEdge<V>> edges() {
+    return edges;
   }
 
   /** Returns vertices sorted by layer (y position), then by x position within each layer. */
