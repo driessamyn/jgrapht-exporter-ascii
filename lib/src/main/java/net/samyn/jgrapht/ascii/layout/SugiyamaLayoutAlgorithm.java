@@ -1,5 +1,6 @@
 package net.samyn.jgrapht.ascii.layout;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +77,7 @@ public class SugiyamaLayoutAlgorithm<V, E> implements LayoutAlgorithm<V, E> {
     Map<V, String> labels = new HashMap<>();
     Map<V, GridVertex<V>> vertexDimensions = new HashMap<>();
     for (V vertex : graph.vertexSet()) {
-      String label = labelProvider.apply(vertex);
+      String label = Normalizer.normalize(labelProvider.apply(vertex), Normalizer.Form.NFC);
       labels.put(vertex, label);
       vertexDimensions.put(vertex, new GridVertex<>(vertex, label, 0, 0));
     }

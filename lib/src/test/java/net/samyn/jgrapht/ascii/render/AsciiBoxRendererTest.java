@@ -43,7 +43,10 @@ class AsciiBoxRendererTest {
   @Test
   void rendersStraightVerticalEdge() {
     var canvas = new Canvas(20, 15);
-    var edge = new GridEdge<>("A", "B", List.of(new int[] {2, 2}, new int[] {2, 4}));
+    var sourceGv = new GridVertex<>("A", "A", 0, 0);
+    var targetGv = new GridVertex<>("B", "B", 0, 0);
+    var edge =
+        new GridEdge<>("A", "B", sourceGv, targetGv, List.of(new int[] {2, 2}, new int[] {2, 4}));
     renderer.renderEdge(canvas, edge);
 
     assertEquals('|', canvas.charAt(2, 3));
@@ -56,7 +59,10 @@ class AsciiBoxRendererTest {
     var vertex = new GridVertex<>("A", "A", 0, 0);
     renderer.renderVertex(canvas, vertex);
 
-    var edge = new GridEdge<>("A", "B", List.of(new int[] {2, 2}, new int[] {2, 4}));
+    var sourceGv = new GridVertex<>("A", "A", 0, 0);
+    var targetGv = new GridVertex<>("B", "B", 0, 0);
+    var edge =
+        new GridEdge<>("A", "B", sourceGv, targetGv, List.of(new int[] {2, 2}, new int[] {2, 4}));
     renderer.renderEdge(canvas, edge);
 
     // Junction on bottom border
@@ -68,10 +74,14 @@ class AsciiBoxRendererTest {
   @Test
   void rendersBentEdge() {
     var canvas = new Canvas(20, 15);
+    var sourceGv = new GridVertex<>("A", "A", 0, 0);
+    var targetGv = new GridVertex<>("B", "B", 0, 0);
     var edge =
         new GridEdge<>(
             "A",
             "B",
+            sourceGv,
+            targetGv,
             List.of(new int[] {2, 2}, new int[] {2, 3}, new int[] {8, 3}, new int[] {8, 4}));
     renderer.renderEdge(canvas, edge);
 

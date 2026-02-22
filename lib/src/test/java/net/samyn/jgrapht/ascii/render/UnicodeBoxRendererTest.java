@@ -43,7 +43,10 @@ class UnicodeBoxRendererTest {
   void rendersStraightVerticalEdge() {
     var canvas = new Canvas(20, 15);
     // Straight edge: starts at border row (2), ends at arrow row (4)
-    var edge = new GridEdge<>("A", "B", List.of(new int[] {2, 2}, new int[] {2, 4}));
+    var sourceGv = new GridVertex<>("A", "A", 0, 0);
+    var targetGv = new GridVertex<>("B", "B", 0, 0);
+    var edge =
+        new GridEdge<>("A", "B", sourceGv, targetGv, List.of(new int[] {2, 2}, new int[] {2, 4}));
     renderer.renderEdge(canvas, edge);
 
     assertEquals('\u2502', canvas.charAt(2, 3)); // │ in the gap
@@ -58,7 +61,10 @@ class UnicodeBoxRendererTest {
     renderer.renderVertex(canvas, vertex);
 
     // Edge exits from centre of bottom border (x=2, y=2)
-    var edge = new GridEdge<>("A", "B", List.of(new int[] {2, 2}, new int[] {2, 4}));
+    var sourceGv = new GridVertex<>("A", "A", 0, 0);
+    var targetGv = new GridVertex<>("B", "B", 0, 0);
+    var edge =
+        new GridEdge<>("A", "B", sourceGv, targetGv, List.of(new int[] {2, 2}, new int[] {2, 4}));
     renderer.renderEdge(canvas, edge);
 
     // Junction on bottom border
@@ -71,10 +77,14 @@ class UnicodeBoxRendererTest {
   void rendersBentEdge() {
     var canvas = new Canvas(20, 15);
     // Bent edge: border → down → right → down
+    var sourceGv = new GridVertex<>("A", "A", 0, 0);
+    var targetGv = new GridVertex<>("B", "B", 0, 0);
     var edge =
         new GridEdge<>(
             "A",
             "B",
+            sourceGv,
+            targetGv,
             List.of(new int[] {2, 2}, new int[] {2, 3}, new int[] {8, 3}, new int[] {8, 4}));
     renderer.renderEdge(canvas, edge);
 

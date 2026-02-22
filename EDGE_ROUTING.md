@@ -163,8 +163,9 @@ creating a visual connection between the box and the edge.
 
 ### Rendering Order
 
-Edges should be rendered before vertices to avoid edge segments overwriting box borders and labels. When vertices
-are drawn after edges, any overlapping edge characters are naturally masked by the vertex box rendering.
+Vertices should be rendered before edges. This ensures border characters are present when edges are drawn, allowing
+the renderer to detect borders and replace them with junction characters (`┬` / `+`). Edge segments in the gap
+between layers are drawn after vertices, so they are not overwritten.
 
 ## Related
 

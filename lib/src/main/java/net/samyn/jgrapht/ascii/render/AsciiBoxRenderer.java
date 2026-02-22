@@ -53,10 +53,15 @@ public class AsciiBoxRenderer implements CanvasRenderer {
 
     // Draw the first waypoint as a junction on the source bottom border
     int[] first = path.get(0);
-    char existing = canvas.charAt(first[0], first[1]);
+    char existingAtFirstWaypoint = canvas.charAt(first[0], first[1]);
     boolean drewJunction = false;
-    if (existing == '-') {
-      canvas.putChar(first[0], first[1], '+');
+    // If current char is a horizontal line, convert to a T-junction.
+    // If it's already a junction or cross, consider it drawn.
+    if (existingAtFirstWaypoint == '-') { // - (horizontal border)
+      canvas.putChar(first[0], first[1], '+'); // + (T-junction down/cross)
+      drewJunction = true;
+    } else if (existingAtFirstWaypoint == '+') { // Already a '+'
+      // Already a junction that a vertical line can pass through
       drewJunction = true;
     }
 
@@ -74,7 +79,7 @@ public class AsciiBoxRenderer implements CanvasRenderer {
           if (drewJunction && i == 0 && y == y1) {
             continue; // skip — already drawn as junction
           }
-          canvas.putChar(x1, y, '|');
+          canvas.putCharWithPrecedence(x1, y, '|');
         }
       } else if (y1 == y2) {
         // Horizontal segment
@@ -84,7 +89,7 @@ public class AsciiBoxRenderer implements CanvasRenderer {
           if (drewJunction && i == 0 && cx == x1) {
             continue; // skip — already drawn as junction
           }
-          canvas.putChar(cx, y1, '-');
+          canvas.putCharWithPrecedence(cx, y1, '-');
         }
       }
     }
@@ -98,12 +103,12 @@ public class AsciiBoxRenderer implements CanvasRenderer {
       boolean prevHorizontal = (prevY == curY);
       boolean nextHorizontal = (curY == nextY);
       if (prevHorizontal != nextHorizontal) {
-        canvas.putChar(path.get(i)[0], curY, '+');
+        canvas.putCharWithPrecedence(path.get(i)[0], curY, '+');
       }
     }
 
     // Arrow at the last waypoint
     int[] last = path.get(path.size() - 1);
-    canvas.putChar(last[0], last[1], 'v');
+    canvas.putCharWithPrecedence(last[0], last[1], 'v');
   }
 }

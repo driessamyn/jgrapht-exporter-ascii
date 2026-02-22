@@ -71,7 +71,7 @@ public class OrthogonalEdgeRouter implements EdgeRouter {
         path.add(new int[] {entryX, entryY - 1});
       }
 
-      edges.add(new GridEdge<>(source, target, path));
+      edges.add(new GridEdge<>(source, target, sourceVertex, targetVertex, path));
     }
 
     return edges;
