@@ -100,6 +100,8 @@ Rendered example:
 │ A │
 └─┬─┘
   │
+  │
+  │
   v
 ┌───┐
 │ B │
@@ -122,12 +124,35 @@ Rendered example:
 │ A │
 └─┬─┘
   │
+  │
   └──┐
      v
    ┌───┐
    │ B │
    └───┘
 ```
+
+## Lane Assignment
+
+When multiple edges share the same inter-layer gap, their horizontal segments can visually merge into a single line,
+making it hard to trace individual connections. The `LaneTracker` addresses this by spreading horizontal segments
+across different rows within each gap.
+
+The `LAYER_GAP` between vertex boxes is 4 rows, providing space for up to 4 horizontal edge segments on separate rows.
+As each edge is routed, the tracker records which (row, x-range) combinations are already claimed. Before placing a
+new horizontal segment, the router calls `findFreeRow` to locate the first unclaimed row in the gap, avoiding overlap
+with previously routed edges.
+
+### How it works
+
+1. A single `LaneTracker` instance is created per routing pass and shared across all edges.
+2. For bent paths, after computing the initial bend row, the router queries `findFreeRow(bendY, maxY, minX, maxX)`
+   to find a free row for the horizontal segment.
+3. For vertical paths with obstacle detours, the tracker similarly assigns free rows for the horizontal detour segments.
+4. After each path is constructed, all its horizontal segments are registered with `claim(y, minX, maxX)`.
+
+This ensures that in dense graphs — such as the film production workflow — each horizontal edge segment occupies its
+own row, making the output easier to read.
 
 ## Rendering
 

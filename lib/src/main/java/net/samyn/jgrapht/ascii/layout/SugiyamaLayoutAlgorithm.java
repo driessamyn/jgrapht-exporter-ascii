@@ -33,7 +33,7 @@ public class SugiyamaLayoutAlgorithm<V, E> implements LayoutAlgorithm<V, E> {
   private static final int BOX_HEIGHT = 3;
 
   /** Vertical gap between the bottom of one vertex box and the top of the next layer. */
-  private static final int LAYER_GAP = 2;
+  private static final int LAYER_GAP = 4;
 
   /** Horizontal gap between adjacent vertex boxes within a layer. */
   private static final int VERTEX_GAP = 2;
@@ -140,7 +140,7 @@ public class SugiyamaLayoutAlgorithm<V, E> implements LayoutAlgorithm<V, E> {
     GridModel<V> vertexModel = new GridModel<>(positioned);
 
     // Step 6: Route edges
-    List<GridEdge<V>> edges = new OrthogonalEdgeRouter().routeEdges(graph, vertexModel);
+    List<GridEdge<V>> edges = new OrthogonalEdgeRouter().routeEdges(graph, vertexModel, positioned);
 
     return new GridModel<>(positioned, edges);
   }

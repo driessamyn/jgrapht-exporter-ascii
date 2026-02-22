@@ -84,7 +84,7 @@ startX = (maxLayerWidth - thisLayerWidth) / 2
 ```
 
 Vertices are placed left to right within each layer, separated by a horizontal gap (2 characters). Layers are stacked
-top to bottom, separated by a vertical gap (2 characters) to leave room for edge routing.
+top to bottom, separated by a vertical gap (4 characters) to leave room for edge routing.
 
 ### Example Walkthrough: Diamond DAG
 
@@ -105,11 +105,11 @@ Given the diamond graph A→B, A→C, B→D, C→D with layers A=0, {B,C}=1, D=2
 | Vertex | Layer | startX            | x | y  |
 |--------|-------|-------------------|---|----|
 | A      | 0     | (12 - 5) / 2 = 3  | 3 | 0  |
-| B      | 1     | (12 - 12) / 2 = 0 | 0 | 5  |
-| C      | 1     | (after B)         | 7 | 5  |
-| D      | 2     | (12 - 5) / 2 = 3  | 3 | 10 |
+| B      | 1     | (12 - 12) / 2 = 0 | 0 | 7  |
+| C      | 1     | (after B)         | 7 | 7  |
+| D      | 2     | (12 - 5) / 2 = 3  | 3 | 14 |
 
-**Y spacing:** Each layer starts at `previousY + boxHeight + gap` = `previousY + 3 + 2 = previousY + 5`.
+**Y spacing:** Each layer starts at `previousY + boxHeight + gap` = `previousY + 3 + 4 = previousY + 7`.
 
 **Result on the canvas:**
 
@@ -118,9 +118,13 @@ Given the diamond graph A→B, A→C, B→D, C→D with layers A=0, {B,C}=1, D=2
    │ A │
    └───┘
 
+
+
 ┌───┐ ┌───┐
 │ B │ │ C │
 └───┘ └───┘
+
+
 
    ┌───┐
    │ D │
@@ -133,7 +137,7 @@ The algorithm uses two spacing constants:
 
 | Constant     | Value | Purpose                                           |
 |--------------|-------|---------------------------------------------------|
-| `LAYER_GAP`  | 2     | Vertical gap between layers (for edge routing)    |
+| `LAYER_GAP`  | 4     | Vertical gap between layers (for edge routing)    |
 | `VERTEX_GAP` | 2     | Horizontal gap between vertices in the same layer |
 
 ## Output
