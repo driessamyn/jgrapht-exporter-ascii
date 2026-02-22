@@ -138,14 +138,22 @@ The algorithm uses two spacing constants:
 
 ## Output
 
-The `layout` method returns a `GridModel` containing a list of `GridVertex` objects, each with:
+The `layout` method returns a `GridModel` containing:
+
+**Vertices** — a list of `GridVertex` objects, each with:
 - `label()` — the display text
 - `x()` — the left column position on the canvas
 - `y()` — the top row position on the canvas
 - `width()` — the total box width (computed from the label)
 - `height()` — the total box height (always 3)
 
+**Edges** — a list of `GridEdge` objects, each with:
+- `source()` — the source vertex
+- `target()` — the target vertex
+- `path()` — ordered waypoints forming the edge route
+
 ## Related
 
 - [Long Edge Splitting](LONG_EDGE_SPLITTING.md) — how edges spanning multiple layers are handled before
   crossing minimisation
+- [Edge Routing](EDGE_ROUTING.md) — how edges are routed between positioned vertices

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.function.Function;
+import net.samyn.jgrapht.ascii.model.GridEdge;
 import net.samyn.jgrapht.ascii.model.GridModel;
 import net.samyn.jgrapht.ascii.model.GridVertex;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -271,6 +272,49 @@ class SugiyamaLayoutAlgorithmTest {
     for (GridVertex<String> gv : result.vertices()) {
       assertSame(String.class, gv.vertex().getClass());
     }
+  }
+
+  @Test
+  void layout_containsEdgesForEachGraphEdge() {
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addEdge("A", "B");
+
+    var layout = new SugiyamaLayoutAlgorithm<String, DefaultEdge>(Object::toString);
+    GridModel<String> result = layout.layout(graph);
+
+    assertEquals(1, result.edges().size());
+    GridEdge<String> edge = result.edges().get(0);
+    assertEquals("A", edge.source());
+    assertEquals("B", edge.target());
+    assertFalse(edge.path().isEmpty());
+  }
+
+  @Test
+  void layout_bypassEdge_producesEdges() {
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addEdge("A", "B");
+    graph.addEdge("B", "C");
+    graph.addEdge("A", "C"); // bypass: spans 2 layers
+
+    var layout = new SugiyamaLayoutAlgorithm<String, DefaultEdge>(Object::toString);
+    GridModel<String> result = layout.layout(graph);
+
+    // 3 edges in the original graph → 3 routed edges
+    assertEquals(3, result.edges().size());
+  }
+
+  @Test
+  void emptyGraph_returnsEmptyEdges() {
+    var graph = directedGraph();
+    var layout = new SugiyamaLayoutAlgorithm<String, DefaultEdge>(Object::toString);
+    GridModel<String> result = layout.layout(graph);
+
+    assertTrue(result.edges().isEmpty());
   }
 
   private DefaultDirectedGraph<String, DefaultEdge> directedGraph() {

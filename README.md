@@ -68,6 +68,7 @@ exporter.exportGraph(graph, System.out);
 *   [Crossing Minimisation Explained](CROSSING_MINIMISATION.md) - Learn how edge crossings are reduced between layers.
 *   [Long Edge Splitting Explained](LONG_EDGE_SPLITTING.md) - Learn how edges spanning multiple layers are handled.
 *   [Coordinate Assignment Explained](COORDINATE_ASSIGNMENT.md) - Learn how vertices are positioned on the character grid.
+*   [Edge Routing Explained](EDGE_ROUTING.md) - Learn how edges are routed between vertices using orthogonal paths.
 
 ## Requirements
 

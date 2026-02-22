@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import net.samyn.jgrapht.ascii.model.GridEdge;
 import net.samyn.jgrapht.ascii.model.GridModel;
 import net.samyn.jgrapht.ascii.model.GridVertex;
+import net.samyn.jgrapht.ascii.routing.OrthogonalEdgeRouter;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -134,6 +136,11 @@ public class SugiyamaLayoutAlgorithm<V, E> implements LayoutAlgorithm<V, E> {
       currentY += BOX_HEIGHT + LAYER_GAP;
     }
 
-    return new GridModel<>(positioned);
+    GridModel<V> vertexModel = new GridModel<>(positioned);
+
+    // Step 6: Route edges
+    List<GridEdge<V>> edges = new OrthogonalEdgeRouter().routeEdges(graph, vertexModel);
+
+    return new GridModel<>(positioned, edges);
   }
 }
