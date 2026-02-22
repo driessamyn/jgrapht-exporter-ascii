@@ -5,7 +5,8 @@ which converts abstract layer and ordering information into concrete (x, y) canv
 
 ## Purpose
 
-After [layer assignment](LAYERING.md) and [crossing minimisation](CROSSING_MINIMISATION.md), we know:
+After [layer assignment](LAYERING.md), [long edge splitting](LONG_EDGE_SPLITTING.md), and
+[crossing minimisation](CROSSING_MINIMISATION.md), we know:
 - Which layer each vertex belongs to (its row in the output)
 - The order of vertices within each layer (minimising edge crossings)
 
@@ -30,14 +31,20 @@ Graph<V,E>
 └──────────┬────────────┘
            │
            ▼
+┌───────────────────────┐
+│  2. Long Edge Split   │  → SplitResult (augmented graph + layers + dummy set)
+│     (LongEdgeSplitter)│
+└──────────┬────────────┘
+           │
+           ▼
 ┌───────────────────────────┐
-│  2. Crossing Minimisation │  → List<List<V>> (ordered layers)
+│  3. Crossing Minimisation │  → List<List<Object>> (ordered layers)
 │     (CrossingMinimiser)   │
 └──────────┬────────────────┘
            │
            ▼
 ┌───────────────────────────┐
-│  3. Coordinate Assignment │  → GridModel (positioned vertices)
+│  4. Coordinate Assignment │  → GridModel (positioned vertices)
 └───────────────────────────┘
 ```
 
@@ -138,8 +145,7 @@ The `layout` method returns a `GridModel` containing a list of `GridVertex` obje
 - `width()` — the total box width (computed from the label)
 - `height()` — the total box height (always 3)
 
-## Known Limitations
+## Related
 
-- **Long edges are not yet supported.** If the `LayerAssigner` produces an edge spanning more than one layer
-  (e.g. A at layer 0 directly connected to C at layer 2), the `CrossingMinimiser` will reject it. This will be
-  addressed with dummy vertex insertion (see Phase 6.5 in the plan) before v1 release.
+- [Long Edge Splitting](LONG_EDGE_SPLITTING.md) — how edges spanning multiple layers are handled before
+  crossing minimisation
