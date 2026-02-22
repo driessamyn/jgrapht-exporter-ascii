@@ -54,10 +54,16 @@ public class UnicodeBoxRenderer implements CanvasRenderer {
 
     // Draw the first waypoint as a junction on the source bottom border
     int[] first = path.get(0);
-    char existing = canvas.charAt(first[0], first[1]);
+    char existingAtFirstWaypoint = canvas.charAt(first[0], first[1]);
     boolean drewJunction = false;
-    if (existing == '\u2500') { // ─ (horizontal border)
+    // If current char is a horizontal line, convert to a T-junction.
+    // If it's already a junction or cross, consider it drawn.
+    if (existingAtFirstWaypoint == '\u2500') { // ─ (horizontal border)
       canvas.putChar(first[0], first[1], '\u252C'); // ┬ (T-junction down)
+      drewJunction = true;
+    } else if (existingAtFirstWaypoint == '\u252C' // ┬ (T-junction down)
+        || existingAtFirstWaypoint == '\u253C') { // ┼ (Cross junction)
+      // Already a junction that a vertical line can pass through
       drewJunction = true;
     }
 
@@ -75,7 +81,7 @@ public class UnicodeBoxRenderer implements CanvasRenderer {
           if (drewJunction && i == 0 && y == y1) {
             continue; // skip — already drawn as junction
           }
-          canvas.putChar(x1, y, '\u2502'); // │
+          canvas.putCharWithPrecedence(x1, y, '\u2502'); // │
         }
       } else if (y1 == y2) {
         // Horizontal segment
@@ -85,7 +91,7 @@ public class UnicodeBoxRenderer implements CanvasRenderer {
           if (drewJunction && i == 0 && cx == x1) {
             continue; // skip — already drawn as junction
           }
-          canvas.putChar(cx, y1, '\u2500'); // ─
+          canvas.putCharWithPrecedence(cx, y1, '\u2500'); // ─
         }
       }
     }
@@ -107,22 +113,22 @@ public class UnicodeBoxRenderer implements CanvasRenderer {
       }
 
       if (prevX < curX && nextY > curY) {
-        canvas.putChar(curX, curY, '\u2510'); // ┐ (came from left, going down)
+        canvas.putCharWithPrecedence(curX, curY, '\u2510'); // ┐ (came from left, going down)
       } else if (prevX > curX && nextY > curY) {
-        canvas.putChar(curX, curY, '\u250C'); // ┌ (came from right, going down)
+        canvas.putCharWithPrecedence(curX, curY, '\u250C'); // ┌ (came from right, going down)
       } else if (prevY < curY && nextX > curX) {
-        canvas.putChar(curX, curY, '\u2514'); // └ (came from above, going right)
+        canvas.putCharWithPrecedence(curX, curY, '\u2514'); // └ (came from above, going right)
       } else if (prevY < curY && nextX < curX) {
-        canvas.putChar(curX, curY, '\u2518'); // ┘ (came from above, going left)
+        canvas.putCharWithPrecedence(curX, curY, '\u2518'); // ┘ (came from above, going left)
       } else if (prevY > curY && nextX > curX) {
-        canvas.putChar(curX, curY, '\u250C'); // ┌ (came from below, going right)
+        canvas.putCharWithPrecedence(curX, curY, '\u250C'); // ┌ (came from below, going right)
       } else if (prevY > curY && nextX < curX) {
-        canvas.putChar(curX, curY, '\u2510'); // ┐ (came from below, going left)
+        canvas.putCharWithPrecedence(curX, curY, '\u2510'); // ┐ (came from below, going left)
       }
     }
 
     // Arrow at the last waypoint
     int[] last = path.get(path.size() - 1);
-    canvas.putChar(last[0], last[1], 'v');
+    canvas.putCharWithPrecedence(last[0], last[1], 'v');
   }
 }

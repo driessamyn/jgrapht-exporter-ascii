@@ -51,6 +51,108 @@ public class Canvas {
     }
   }
 
+  public void putCharWithPrecedence(int x, int y, char newChar) {
+    ensureCapacity(x + 1, y + 1);
+    char existingChar = grid[y][x];
+
+    if (newChar == ' ') { // New char is empty space, do not overwrite
+      return;
+    }
+    if (existingChar == ' ') { // Existing is empty space, always draw new char
+      grid[y][x] = newChar;
+      return;
+    }
+
+    // --- Line crossing line to form a cross ---
+    if ((isUnicodeHorizontalLine(existingChar) && isUnicodeVerticalLine(newChar))
+        || (isUnicodeVerticalLine(existingChar) && isUnicodeHorizontalLine(newChar))) {
+      grid[y][x] = '\u253C'; // ┼
+      return;
+    }
+    if ((isAsciiHorizontalLine(existingChar) && isAsciiVerticalLine(newChar))
+        || (isAsciiVerticalLine(existingChar) && isAsciiHorizontalLine(newChar))) {
+      grid[y][x] = '+'; // ASCII Cross
+      return;
+    }
+
+    // --- Precedence: Junctions/Corners over Lines ---
+    // If new char is a line and existing is a stronger junction/corner, preserve existing
+    if (isLine(newChar) && isJunctionOrCorner(existingChar)) {
+      return;
+    }
+    // If new char is a junction/corner and existing is a line, overwrite with new char
+    if (isJunctionOrCorner(newChar) && isLine(existingChar)) {
+      grid[y][x] = newChar;
+      return;
+    }
+
+    // --- Arrows ---
+    if (isArrow(newChar)) {
+      if (!isJunctionOrCorner(existingChar)) { // Overwrite if not a strong junction/corner
+        grid[y][x] = newChar;
+      }
+      return;
+    }
+
+    // Default: overwrite (e.g., Junction over Junction, Corner over Corner, etc.)
+    grid[y][x] = newChar;
+  }
+
+  private static boolean isUnicodeHorizontalLine(char c) {
+    return c == '\u2500' || c == '\u2501'; // ─ or ━
+  }
+
+  private static boolean isUnicodeVerticalLine(char c) {
+    return c == '\u2502' || c == '\u2503'; // │ or ┃
+  }
+
+  private static boolean isAsciiHorizontalLine(char c) {
+    return c == '-';
+  }
+
+  private static boolean isAsciiVerticalLine(char c) {
+    return c == '|';
+  }
+
+  private static boolean isLine(char c) { // General line check (Unicode or ASCII)
+    return isUnicodeHorizontalLine(c)
+        || isUnicodeVerticalLine(c)
+        || isAsciiHorizontalLine(c)
+        || isAsciiVerticalLine(c);
+  }
+
+  private static boolean isUnicodeJunction(char c) {
+    return c == '\u252C' || c == '\u2534' || c == '\u251C' || c == '\u2524' || c == '\u253C';
+  }
+
+  private static boolean isAsciiJunction(char c) {
+    return c == '+'; // ASCII '+' acts as junction/cross/corner
+  }
+
+  private static boolean isJunction(char c) { // General junction check
+    return isUnicodeJunction(c) || isAsciiJunction(c);
+  }
+
+  private static boolean isUnicodeCorner(char c) {
+    return c == '\u250C' || c == '\u2510' || c == '\u2514' || c == '\u2518';
+  }
+
+  private static boolean isAsciiCorner(char c) {
+    return c == '+'; // ASCII '+' acts as junction/cross/corner
+  }
+
+  private static boolean isCorner(char c) { // General corner check
+    return isUnicodeCorner(c) || isAsciiCorner(c);
+  }
+
+  private static boolean isJunctionOrCorner(char c) { // General check
+    return isJunction(c) || isCorner(c);
+  }
+
+  private static boolean isArrow(char c) {
+    return c == 'v' || c == '^' || c == '<' || c == '>';
+  }
+
   @Override
   public String toString() {
     // Find last non-blank line
