@@ -15,7 +15,7 @@ import net.samyn.jgrapht.ascii.model.GridVertex;
 public class AsciiBoxRenderer implements CanvasRenderer {
 
   @Override
-  public void renderVertex(Canvas canvas, GridVertex vertex) {
+  public void renderVertex(Canvas canvas, GridVertex<?> vertex) {
     int x = vertex.x();
     int y = vertex.y();
     int innerWidth = vertex.width() - 2;

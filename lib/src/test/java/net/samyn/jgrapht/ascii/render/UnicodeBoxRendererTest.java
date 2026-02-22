@@ -13,7 +13,7 @@ class UnicodeBoxRendererTest {
   @Test
   void rendersSingleVertexBox() {
     var canvas = new Canvas(20, 10);
-    var vertex = new GridVertex("Hello", 0, 0);
+    var vertex = new GridVertex<>("x", "Hello", 0, 0);
     renderer.renderVertex(canvas, vertex);
 
     var expected =
@@ -27,7 +27,7 @@ class UnicodeBoxRendererTest {
   @Test
   void rendersVertexAtOffset() {
     var canvas = new Canvas(20, 10);
-    var vertex = new GridVertex("Hi", 3, 2);
+    var vertex = new GridVertex<>("x", "Hi", 3, 2);
     renderer.renderVertex(canvas, vertex);
 
     assertEquals('┌', canvas.charAt(3, 2));
@@ -40,7 +40,7 @@ class UnicodeBoxRendererTest {
   @Test
   void rendersShortLabel() {
     var canvas = new Canvas(20, 10);
-    var vertex = new GridVertex("A", 0, 0);
+    var vertex = new GridVertex<>("x", "A", 0, 0);
     renderer.renderVertex(canvas, vertex);
 
     var expected =
@@ -54,7 +54,7 @@ class UnicodeBoxRendererTest {
   @Test
   void rendersEmptyLabel() {
     var canvas = new Canvas(20, 10);
-    var vertex = new GridVertex("", 0, 0);
+    var vertex = new GridVertex<>("x", "", 0, 0);
     renderer.renderVertex(canvas, vertex);
 
     var expected =

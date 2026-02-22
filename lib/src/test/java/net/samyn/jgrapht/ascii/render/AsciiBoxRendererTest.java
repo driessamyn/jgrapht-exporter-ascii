@@ -13,7 +13,7 @@ class AsciiBoxRendererTest {
   @Test
   void rendersSingleVertexBox() {
     var canvas = new Canvas(20, 10);
-    var vertex = new GridVertex("Hello", 0, 0);
+    var vertex = new GridVertex<>("x", "Hello", 0, 0);
     renderer.renderVertex(canvas, vertex);
 
     var expected =
@@ -27,7 +27,7 @@ class AsciiBoxRendererTest {
   @Test
   void rendersShortLabel() {
     var canvas = new Canvas(20, 10);
-    var vertex = new GridVertex("A", 0, 0);
+    var vertex = new GridVertex<>("x", "A", 0, 0);
     renderer.renderVertex(canvas, vertex);
 
     var expected =
