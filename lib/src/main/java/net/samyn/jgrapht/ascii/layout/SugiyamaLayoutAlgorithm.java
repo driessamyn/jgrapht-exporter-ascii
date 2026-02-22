@@ -140,7 +140,7 @@ public class SugiyamaLayoutAlgorithm<V, E> implements LayoutAlgorithm<V, E> {
     GridModel<V> vertexModel = new GridModel<>(positioned);
 
     // Step 6: Route edges
-    List<GridEdge<V>> edges = new OrthogonalEdgeRouter().routeEdges(graph, vertexModel);
+    List<GridEdge<V>> edges = new OrthogonalEdgeRouter().routeEdges(graph, vertexModel, positioned);
 
     return new GridModel<>(positioned, edges);
   }
