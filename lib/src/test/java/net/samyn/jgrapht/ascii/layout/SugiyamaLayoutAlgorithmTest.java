@@ -161,6 +161,118 @@ class SugiyamaLayoutAlgorithmTest {
             || ("v2".equals(first.vertex()) && "v1".equals(second.vertex())));
   }
 
+  @Test
+  void linearChainWithBypass_succeeds() {
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addEdge("A", "B");
+    graph.addEdge("B", "C");
+    graph.addEdge("A", "C"); // bypass: spans 2 layers
+
+    var layout = new SugiyamaLayoutAlgorithm<String, DefaultEdge>(Object::toString);
+    GridModel<String> result = layout.layout(graph);
+
+    assertEquals(3, result.vertices().size());
+    List<GridVertex<String>> sorted = result.verticesByLayer();
+
+    // A at layer 0, B at layer 1, C at layer 2
+    assertTrue(sorted.get(0).y() < sorted.get(1).y());
+    assertTrue(sorted.get(1).y() < sorted.get(2).y());
+  }
+
+  @Test
+  void multiLevelBypass_succeeds() {
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addVertex("D");
+    graph.addEdge("A", "B");
+    graph.addEdge("B", "C");
+    graph.addEdge("C", "D");
+    graph.addEdge("A", "D"); // bypass: spans 3 layers
+
+    var layout = new SugiyamaLayoutAlgorithm<String, DefaultEdge>(Object::toString);
+    GridModel<String> result = layout.layout(graph);
+
+    assertEquals(4, result.vertices().size());
+  }
+
+  @Test
+  void dummyVertices_doNotAppearInOutput() {
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addEdge("A", "B");
+    graph.addEdge("B", "C");
+    graph.addEdge("A", "C"); // bypass: creates a dummy
+
+    var layout = new SugiyamaLayoutAlgorithm<String, DefaultEdge>(Object::toString);
+    GridModel<String> result = layout.layout(graph);
+
+    // Only original vertices appear
+    for (GridVertex<String> gv : result.vertices()) {
+      assertTrue(
+          "A".equals(gv.vertex()) || "B".equals(gv.vertex()) || "C".equals(gv.vertex()),
+          "Unexpected vertex in output: " + gv.vertex());
+    }
+  }
+
+  @Test
+  void bypassEdge_doesNotShiftVertexPositions() {
+    // A linear chain without bypass
+    var graphWithout = directedGraph();
+    graphWithout.addVertex("A");
+    graphWithout.addVertex("B");
+    graphWithout.addVertex("C");
+    graphWithout.addEdge("A", "B");
+    graphWithout.addEdge("B", "C");
+
+    var layout = new SugiyamaLayoutAlgorithm<String, DefaultEdge>(Object::toString);
+    GridModel<String> withoutBypass = layout.layout(graphWithout);
+
+    // Same chain with an additional bypass edge A->C
+    var graphWith = directedGraph();
+    graphWith.addVertex("A");
+    graphWith.addVertex("B");
+    graphWith.addVertex("C");
+    graphWith.addEdge("A", "B");
+    graphWith.addEdge("B", "C");
+    graphWith.addEdge("A", "C");
+
+    GridModel<String> withBypass = layout.layout(graphWith);
+
+    // Dummy vertices should not affect real vertex positions
+    for (String name : List.of("A", "B", "C")) {
+      GridVertex<String> expected = findByLabel(withoutBypass.vertices(), name);
+      GridVertex<String> actual = findByLabel(withBypass.vertices(), name);
+      assertEquals(expected.x(), actual.x(), "x position of " + name + " should not drift");
+      assertEquals(expected.y(), actual.y(), "y position of " + name + " should not drift");
+    }
+  }
+
+  @Test
+  void vertexIdentity_preservedAfterSplitting() {
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addEdge("A", "B");
+    graph.addEdge("B", "C");
+    graph.addEdge("A", "C");
+
+    var layout = new SugiyamaLayoutAlgorithm<String, DefaultEdge>(Object::toString);
+    GridModel<String> result = layout.layout(graph);
+
+    // Output vertices are the original String instances, not Object wrappers
+    for (GridVertex<String> gv : result.vertices()) {
+      assertSame(String.class, gv.vertex().getClass());
+    }
+  }
+
   private DefaultDirectedGraph<String, DefaultEdge> directedGraph() {
     return new DefaultDirectedGraph<>(DefaultEdge.class);
   }

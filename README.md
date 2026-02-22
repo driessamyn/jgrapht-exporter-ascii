@@ -66,6 +66,7 @@ exporter.exportGraph(graph, System.out);
 
 *   [Graph Layering Explained](LAYERING.md) - Learn how graph vertices are assigned to layers for visualisation.
 *   [Crossing Minimisation Explained](CROSSING_MINIMISATION.md) - Learn how edge crossings are reduced between layers.
+*   [Long Edge Splitting Explained](LONG_EDGE_SPLITTING.md) - Learn how edges spanning multiple layers are handled.
 *   [Coordinate Assignment Explained](COORDINATE_ASSIGNMENT.md) - Learn how vertices are positioned on the character grid.
 
 ## Requirements
