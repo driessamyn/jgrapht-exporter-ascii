@@ -45,3 +45,20 @@ jobs:
         name: coverage-report
         path: build/reports/kover
         retention-days: 1
+
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@27d65e188ec43221b20d26de30f4892fad91df2f
+      if: always()
+      with:
+        check_name: Unit Tests
+        files: |
+          **/build/test-results/*/TEST-*.xml
+
+    - name: Add coverage report to PR
+      id: kover
+      uses: mi-kas/kover-report@5f58465b6f395c8fa3adc2665e27250bad87de50
+      with:
+        path: |
+          build/reports/kover/report.xml
+        title: Code Coverage
+        update-comment: true
