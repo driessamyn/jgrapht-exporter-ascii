@@ -358,6 +358,64 @@ class OrthogonalEdgeRouterTest {
     }
   }
 
+  @Test
+  void verticalDetour_tightGap_doesNotEnterNextVertexBox() {
+    // Layout: gap of 2 rows between layers 1 and 2 (rows 8-9 are the channel).
+    //   Layer 0: A(0,0)
+    //   Layer 1: B(0,5), D(10,5), E(20,5)
+    //   Layer 2: C(0,10), F(1,10), G(2,10)
+    //
+    // D→F and E→G are short-span bent edges (span=5) that route first.
+    // Their horizontal segments claim rows 8 and 9 in the x-range overlapping
+    // the detour corridor for A→C.
+    //
+    // A→C (span=10) routes last. It detours around obstacle B. The channelBelow
+    // findFreeRow must NOT return row 10 (C's top border) even though rows 8-9
+    // are occupied.
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addVertex("D");
+    graph.addVertex("E");
+    graph.addVertex("F");
+    graph.addVertex("G");
+    graph.addEdge("D", "F");
+    graph.addEdge("E", "G");
+    graph.addEdge("A", "C");
+
+    var a = new GridVertex<>("A", "A", 0, 0);
+    var b = new GridVertex<>("B", "B", 0, 5);
+    var c = new GridVertex<>("C", "C", 0, 10);
+    var d = new GridVertex<>("D", "D", 10, 5);
+    var e = new GridVertex<>("E", "E", 20, 5);
+    var f = new GridVertex<>("F", "F", 1, 10);
+    var g = new GridVertex<>("G", "G", 2, 10);
+    var all = List.of(a, b, c, d, e, f, g);
+    var model = new GridModel<>(all);
+
+    List<GridEdge<String>> edges = router.routeEdges(graph, model, all);
+
+    // Verify no horizontal detour segment from A→C lands inside C's box (y=10..12)
+    GridEdge<String> acEdge =
+        edges.stream()
+            .filter(edge -> "A".equals(edge.source()) && "C".equals(edge.target()))
+            .findFirst()
+            .orElseThrow();
+    List<int[]> path = acEdge.path();
+    for (int i = 0; i < path.size() - 1; i++) {
+      int[] from = path.get(i);
+      int[] to = path.get(i + 1);
+      if (from[1] == to[1] && from[0] != to[0]) {
+        // Horizontal segment — must not be inside C's box rows
+        int y = from[1];
+        assertTrue(
+            y < 10 || y > 12,
+            "A→C detour has horizontal segment at y=" + y + " inside C's box (rows 10-12)");
+      }
+    }
+  }
+
   // --- Edge routing order tests (Proposal C) ---
 
   @Test

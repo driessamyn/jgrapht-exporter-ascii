@@ -63,6 +63,11 @@ public class Canvas {
       return;
     }
 
+    // --- Arrow protection: arrows are never overwritten ---
+    if (isArrow(existingChar)) {
+      return;
+    }
+
     // --- Line crossing line to form a cross ---
     if ((isUnicodeHorizontalLine(existingChar) && isUnicodeVerticalLine(newChar))
         || (isUnicodeVerticalLine(existingChar) && isUnicodeHorizontalLine(newChar))) {

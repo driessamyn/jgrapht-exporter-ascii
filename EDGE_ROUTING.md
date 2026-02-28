@@ -100,8 +100,6 @@ Rendered example:
 │ A │
 └─┬─┘
   │
-  │
-  │
   v
 ┌───┐
 │ B │
@@ -153,7 +151,11 @@ When multiple edges share the same inter-layer gap, their horizontal segments ca
 making it hard to trace individual connections. The `LaneTracker` addresses this by spreading horizontal segments
 across different rows within each gap.
 
-The `LAYER_GAP` between vertex boxes is 4 rows, providing space for up to 4 horizontal edge segments on separate rows.
+The gap between vertex boxes is **dynamic**, sized to match edge density. After long-edge splitting, the layout
+algorithm counts how many edges cross each inter-layer gap and sets the gap height to
+`clamp(edgeCount, MIN_LAYER_GAP=2, MAX_LAYER_GAP=8)`. Simple gaps (1–2 edges) get the minimum 2 rows, while dense
+gaps (e.g. a fan-out with 5+ edges) get proportionally more room, up to a maximum of 8 rows.
+
 As each edge is routed, the tracker records which (row, x-range) combinations are already claimed. Before placing a
 new horizontal segment, the router calls `findFreeRow` to locate the first unclaimed row in the gap, avoiding overlap
 with previously routed edges.

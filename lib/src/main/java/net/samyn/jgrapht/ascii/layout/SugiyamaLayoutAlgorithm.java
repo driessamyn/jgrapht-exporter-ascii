@@ -32,8 +32,11 @@ public class SugiyamaLayoutAlgorithm<V, E> implements LayoutAlgorithm<V, E> {
   /** Height of a vertex box (top border + label row + bottom border). */
   private static final int BOX_HEIGHT = 3;
 
-  /** Vertical gap between the bottom of one vertex box and the top of the next layer. */
-  private static final int LAYER_GAP = 4;
+  /** Minimum vertical gap between layers (used when few edges cross the gap). */
+  private static final int MIN_LAYER_GAP = 2;
+
+  /** Maximum vertical gap between layers (caps dense gaps to prevent excessive spacing). */
+  private static final int MAX_LAYER_GAP = 8;
 
   /** Horizontal gap between adjacent vertex boxes within a layer. */
   private static final int VERTEX_GAP = 2;
@@ -110,10 +113,29 @@ public class SugiyamaLayoutAlgorithm<V, E> implements LayoutAlgorithm<V, E> {
       maxLayerWidth = Math.max(maxLayerWidth, w);
     }
 
+    // Compute dynamic gap sizes based on edge density per inter-layer gap
+    int layerCount = orderedLayers.size();
+    int[] gapSizes = new int[Math.max(0, layerCount - 1)];
+    if (layerCount > 1) {
+      int[] edgeCounts = new int[layerCount - 1];
+      for (DefaultEdge edge : splitResult.graph().edgeSet()) {
+        Object src = splitResult.graph().getEdgeSource(edge);
+        int srcLayer = splitResult.layers().get(src);
+        if (srcLayer < layerCount - 1) {
+          edgeCounts[srcLayer]++;
+        }
+      }
+      for (int i = 0; i < gapSizes.length; i++) {
+        gapSizes[i] = Math.max(MIN_LAYER_GAP, Math.min(edgeCounts[i], MAX_LAYER_GAP));
+      }
+    }
+
     List<GridVertex<V>> positioned = new ArrayList<>();
     int currentY = 0;
 
-    for (List<V> layer : realLayers) {
+    for (int layerIndex = 0; layerIndex < realLayers.size(); layerIndex++) {
+      List<V> layer = realLayers.get(layerIndex);
+
       // Compute the total width of this layer
       int layerWidth = 0;
       for (int i = 0; i < layer.size(); i++) {
@@ -133,8 +155,10 @@ public class SugiyamaLayoutAlgorithm<V, E> implements LayoutAlgorithm<V, E> {
         currentX += vertexDimensions.get(vertex).width() + VERTEX_GAP;
       }
 
-      // Move to next layer: vertex box height + gap for edge routing
-      currentY += BOX_HEIGHT + LAYER_GAP;
+      // Move to next layer: vertex box height + dynamic gap for edge routing
+      if (layerIndex < gapSizes.length) {
+        currentY += BOX_HEIGHT + gapSizes[layerIndex];
+      }
     }
 
     GridModel<V> vertexModel = new GridModel<>(positioned);

@@ -317,6 +317,53 @@ class SugiyamaLayoutAlgorithmTest {
     assertTrue(result.edges().isEmpty());
   }
 
+  @Test
+  void layout_dynamicGap_sparseEdgesGetMinimalGap() {
+    // A linear chain: only 1 edge per gap → gap should be MIN_LAYER_GAP (2)
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addEdge("A", "B");
+    graph.addEdge("B", "C");
+
+    var layout = new SugiyamaLayoutAlgorithm<String, DefaultEdge>(Object::toString);
+    GridModel<String> result = layout.layout(graph);
+    List<GridVertex<String>> sorted = result.verticesByLayer();
+
+    // BOX_HEIGHT = 3, MIN_LAYER_GAP = 2 → each layer offset = 5
+    assertEquals(0, sorted.get(0).y());
+    assertEquals(5, sorted.get(1).y());
+    assertEquals(10, sorted.get(2).y());
+  }
+
+  @Test
+  void layout_dynamicGap_denseEdgesGetLargerGap() {
+    // Fan-out: A→{B,C,D,E,F} — 5 edges cross the single gap → gap = 5
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addVertex("D");
+    graph.addVertex("E");
+    graph.addVertex("F");
+    graph.addEdge("A", "B");
+    graph.addEdge("A", "C");
+    graph.addEdge("A", "D");
+    graph.addEdge("A", "E");
+    graph.addEdge("A", "F");
+
+    var layout = new SugiyamaLayoutAlgorithm<String, DefaultEdge>(Object::toString);
+    GridModel<String> result = layout.layout(graph);
+    List<GridVertex<String>> sorted = result.verticesByLayer();
+
+    // BOX_HEIGHT = 3, gap = max(2, 5) = 5 → layer 1 at y = 8
+    GridVertex<String> a = findByLabel(sorted, "A");
+    GridVertex<String> b = findByLabel(sorted, "B");
+    assertEquals(0, a.y());
+    assertEquals(8, b.y());
+  }
+
   private DefaultDirectedGraph<String, DefaultEdge> directedGraph() {
     return new DefaultDirectedGraph<>(DefaultEdge.class);
   }
