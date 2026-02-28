@@ -10,6 +10,8 @@ Designed for visualizing DAGs (Directed Acyclic Graphs) in console output, logs,
 │ Start │
 └───┬───┘
     │
+    │
+    │
     v
 ┌───────┐
 │  End  │
