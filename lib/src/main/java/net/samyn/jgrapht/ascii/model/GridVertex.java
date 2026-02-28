@@ -50,6 +50,11 @@ public final class GridVertex<V> {
     return DisplayWidth.width(label) + HORIZONTAL_PADDING + BORDER_WIDTH;
   }
 
+  /** Horizontal centre of the rendered box (the column where edges attach). */
+  public int centreX() {
+    return x + width() / 2;
+  }
+
   /** Total height of the rendered box (top border, label row, bottom border). */
   public int height() {
     return BOX_HEIGHT;

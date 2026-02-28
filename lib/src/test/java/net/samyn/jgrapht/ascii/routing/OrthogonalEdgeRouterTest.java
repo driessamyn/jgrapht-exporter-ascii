@@ -358,6 +358,144 @@ class OrthogonalEdgeRouterTest {
     }
   }
 
+  // --- Edge routing order tests (Proposal C) ---
+
+  @Test
+  void routeEdges_sortsShortEdgesBeforeLongEdges() {
+    // Long edge: A(0,0) → D(10,14) spans 14 rows
+    // Short edge: B(10,0) → C(10,7) spans 7 rows
+    // Short edge should be routed first (appear first in result)
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addVertex("D");
+    graph.addEdge("A", "D");
+    graph.addEdge("B", "C");
+
+    var a = new GridVertex<>("A", "A", 0, 0);
+    var b = new GridVertex<>("B", "B", 10, 0);
+    var c = new GridVertex<>("C", "C", 10, 7);
+    var d = new GridVertex<>("D", "D", 10, 14);
+    var model = new GridModel<>(List.of(a, b, c, d));
+
+    List<GridEdge<String>> edges = router.routeEdges(graph, model, List.of());
+
+    assertEquals(2, edges.size());
+    assertEquals("B", edges.get(0).source());
+    assertEquals("C", edges.get(0).target());
+    assertEquals("A", edges.get(1).source());
+    assertEquals("D", edges.get(1).target());
+  }
+
+  @Test
+  void routeEdges_sameSpan_sortsNarrowerHorizontalFirst() {
+    // Both edges span the same vertical distance (7 rows) but differ in horizontal span.
+    // Wide: A(0,0) → C(20,7) horizontal span = 20
+    // Narrow: B(10,0) → D(15,7) horizontal span = 5
+    // Narrower should be routed first.
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addVertex("D");
+    graph.addEdge("A", "C");
+    graph.addEdge("B", "D");
+
+    var a = new GridVertex<>("A", "A", 0, 0);
+    var b = new GridVertex<>("B", "B", 10, 0);
+    var c = new GridVertex<>("C", "C", 20, 7);
+    var d = new GridVertex<>("D", "D", 15, 7);
+    var model = new GridModel<>(List.of(a, b, c, d));
+
+    List<GridEdge<String>> edges = router.routeEdges(graph, model, List.of());
+
+    assertEquals(2, edges.size());
+    assertEquals("B", edges.get(0).source());
+    assertEquals("D", edges.get(0).target());
+    assertEquals("A", edges.get(1).source());
+    assertEquals("C", edges.get(1).target());
+  }
+
+  @Test
+  void routeEdges_sameSpanAndSource_breaksTieByTargetCoordinates() {
+    // Two edges from the same source with the same vertical and horizontal span.
+    // The comparator must break the tie using target coordinates for deterministic order.
+    // A(5,0) → B(0,7) and A(5,0) → C(10,7). Both have vertical span 7, horizontal
+    // centre span 5 (A centreX=7, B centreX=2, C centreX=12). Source is identical.
+    // Without target tie-breaking the comparator returns 0 → nondeterministic.
+    // With target tie-breaking: B(y=7,x=0) < C(y=7,x=10) → A→B first.
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addEdge("A", "B");
+    graph.addEdge("A", "C");
+
+    var a = new GridVertex<>("A", "A", 5, 0);
+    var b = new GridVertex<>("B", "B", 0, 7);
+    var c = new GridVertex<>("C", "C", 10, 7);
+    var model = new GridModel<>(List.of(a, b, c));
+
+    List<GridEdge<String>> edges = router.routeEdges(graph, model, List.of());
+
+    assertEquals(2, edges.size());
+    assertEquals("B", edges.get(0).target());
+    assertEquals("C", edges.get(1).target());
+  }
+
+  @Test
+  void routeEdges_horizontalSpanUsesBoxCentres_notOrigins() {
+    // Edge A→C: A has a wide label ("Wide") at x=0, width=10, centreX=5.
+    //           C at x=18, width=5, centreX=20. Centre span = |20-5| = 15.
+    // Edge B→D: B has a narrow label ("N") at x=12, width=5, centreX=14.
+    //           D at x=0, width=5, centreX=2. Centre span = |2-14| = 12.
+    //
+    // Origin-based span: A→C = |18-0| = 18, B→D = |0-12| = 12 → B→D first (correct by accident?).
+    // But flip: make B→D wider by origins yet narrower by centres.
+    //
+    // Edge A→C: A("N") at x=20, width=5, centreX=22.
+    //           C("N") at x=5, width=5, centreX=7. Origin span=15, centre span=15.
+    // Edge B→D: B("VeryWideLabel") at x=0, width=20, centreX=10.
+    //           D("N") at x=30, width=5, centreX=32. Origin span=30, centre span=22.
+    //
+    // With origin-based: A→C span=15, B→D span=30 → A→C first.
+    // With centre-based: A→C span=15, B→D span=22 → A→C first. Still same...
+    //
+    // Better scenario: make origins closer but centres farther apart.
+    // Edge A→C: A("VeryVeryWideName") at x=0, width=24, centreX=12.
+    //           C("N") at x=10, width=5, centreX=12. Origin span=10, centre span=0.
+    // Edge B→D: B("N") at x=3, width=5, centreX=5.
+    //           D("N") at x=8, width=5, centreX=10. Origin span=5, centre span=5.
+    //
+    // Origin-based: A→C=10, B→D=5 → B→D first (narrower by origin).
+    // Centre-based: A→C=0, B→D=5 → A→C first (narrower by centre). ← correct for routing.
+    var graph = directedGraph();
+    graph.addVertex("A");
+    graph.addVertex("B");
+    graph.addVertex("C");
+    graph.addVertex("D");
+    graph.addEdge("A", "C");
+    graph.addEdge("B", "D");
+
+    // A has a very wide label so its centre is far from its origin
+    var a = new GridVertex<>("A", "VeryVeryWideName!!", 0, 0); // width=24, centreX=12
+    var c = new GridVertex<>("C", "N", 10, 7); // width=5, centreX=12
+    // B and D are narrow, close by origin but farther by centre
+    var b = new GridVertex<>("B", "N", 3, 0); // width=5, centreX=5
+    var d = new GridVertex<>("D", "N", 8, 7); // width=5, centreX=10
+    var model = new GridModel<>(List.of(a, b, c, d));
+
+    List<GridEdge<String>> edges = router.routeEdges(graph, model, List.of());
+
+    assertEquals(2, edges.size());
+    // A→C has centre span 0 (both centreX=12), so it should route first
+    assertEquals("A", edges.get(0).source());
+    assertEquals("C", edges.get(0).target());
+    assertEquals("B", edges.get(1).source());
+    assertEquals("D", edges.get(1).target());
+  }
+
   private DefaultDirectedGraph<String, DefaultEdge> directedGraph() {
     return new DefaultDirectedGraph<>(DefaultEdge.class);
   }

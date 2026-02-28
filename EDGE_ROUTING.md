@@ -132,6 +132,21 @@ Rendered example:
    └───┘
 ```
 
+## Edge Routing Order
+
+Edges are sorted before routing so that short, local edges are processed first and long, spanning
+edges are processed last. This ensures short edges claim the lanes closest to their vertices while
+long edges use whatever rows remain.
+
+The sort criteria, in priority order:
+
+1. **Vertical span** (ascending) — `|target.y() - source.y()|`. Shorter edges first.
+2. **Horizontal span** (ascending) — `|target.centreX() - source.centreX()|`. Among edges with
+   the same vertical span, narrower edges first. Uses box centres (not origins) since that is
+   where edges attach.
+3. **Coordinate tie-breaking** — deterministic fallback by source y, source x, target y, then
+   target x. This ensures no two distinct edges compare as equal.
+
 ## Lane Assignment
 
 When multiple edges share the same inter-layer gap, their horizontal segments can visually merge into a single line,
