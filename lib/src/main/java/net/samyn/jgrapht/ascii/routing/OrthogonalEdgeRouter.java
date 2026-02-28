@@ -47,8 +47,9 @@ public class OrthogonalEdgeRouter implements EdgeRouter {
       vertexMap.put(gv.vertex(), gv);
     }
 
-    // Sort edges by source then target coordinates for stable, deterministic routing order.
-    // This ensures lane assignment is consistent regardless of graph.edgeSet() iteration order.
+    // Sort edges: short (small vertical span) before long, then narrow (small horizontal span)
+    // before wide. This lets short edges claim the closest lanes to their vertices, while long
+    // spanning edges use whatever rows remain. Deterministic tie-breaking by coordinates.
     List<E> sortedEdges = new ArrayList<>(graph.edgeSet());
     sortedEdges.sort(
         (a, b) -> {
@@ -56,7 +57,15 @@ public class OrthogonalEdgeRouter implements EdgeRouter {
           GridVertex<V> srcB = vertexMap.get(graph.getEdgeSource(b));
           GridVertex<V> tgtA = vertexMap.get(graph.getEdgeTarget(a));
           GridVertex<V> tgtB = vertexMap.get(graph.getEdgeTarget(b));
-          int cmp = Integer.compare(srcA.y(), srcB.y());
+          int spanA = Math.abs(tgtA.y() - srcA.y());
+          int spanB = Math.abs(tgtB.y() - srcB.y());
+          int cmp = Integer.compare(spanA, spanB);
+          if (cmp != 0) return cmp;
+          int hSpanA = Math.abs(tgtA.centreX() - srcA.centreX());
+          int hSpanB = Math.abs(tgtB.centreX() - srcB.centreX());
+          cmp = Integer.compare(hSpanA, hSpanB);
+          if (cmp != 0) return cmp;
+          cmp = Integer.compare(srcA.y(), srcB.y());
           if (cmp != 0) return cmp;
           cmp = Integer.compare(srcA.x(), srcB.x());
           if (cmp != 0) return cmp;
@@ -80,9 +89,9 @@ public class OrthogonalEdgeRouter implements EdgeRouter {
         throw new IllegalStateException("Target vertex '" + target + "' not found in grid model.");
       }
 
-      int exitX = sourceVertex.x() + sourceVertex.width() / 2;
+      int exitX = sourceVertex.centreX();
       int exitY = sourceVertex.y() + 2; // bottom border row
-      int entryX = targetVertex.x() + targetVertex.width() / 2;
+      int entryX = targetVertex.centreX();
       int entryY = targetVertex.y(); // top border row
 
       // Filter obstacles to exclude source and target of the current edge
