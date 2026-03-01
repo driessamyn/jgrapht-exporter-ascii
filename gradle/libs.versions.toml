@@ -1,10 +1,14 @@
 [versions]
 jgrapht = "1.5.2"
 junit-jupiter = "5.11.4"
+deployer = "0.14.0"
+git-semver = "0.18.0"
 
 [libraries]
 jgrapht-core = { module = "org.jgrapht:jgrapht-core", version.ref = "jgrapht" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
 kover-plugin = { module = "org.jetbrains.kotlinx:kover-gradle-plugin", version = "0.9.4" }
+deployer-plugin = { module = "io.deepmedia.tools.deployer:deployer", version.ref = "deployer" }
 
 [plugins]
+git-semver = { id = "com.github.jmongard.git-semver-plugin", version.ref = "git-semver" }

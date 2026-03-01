@@ -1,10 +1,22 @@
 plugins {
     base
     id("org.jetbrains.kotlinx.kover")
+    alias(libs.plugins.git.semver)
+}
+
+semver {
+    releasePattern = "\\Abuild: release"
 }
 
 repositories {
     mavenCentral()
+}
+
+val projectVersion = semver.version
+
+subprojects {
+    group = "net.samyn"
+    version = projectVersion
 }
 
 dependencies {
