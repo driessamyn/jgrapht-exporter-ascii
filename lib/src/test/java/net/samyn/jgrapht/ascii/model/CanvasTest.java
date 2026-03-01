@@ -82,4 +82,54 @@ class CanvasTest {
     canvas.putString(0, 0, "longtext");
     assertEquals("longtext", canvas.toString());
   }
+
+  // --- Arrow protection tests ---
+
+  @Test
+  void putCharWithPrecedence_horizontalLineDoesNotOverwriteArrow() {
+    var canvas = new Canvas(3, 1);
+    canvas.putChar(1, 0, 'v');
+    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
+    assertEquals('v', canvas.charAt(1, 0));
+  }
+
+  @Test
+  void putCharWithPrecedence_verticalLineDoesNotOverwriteArrow() {
+    var canvas = new Canvas(3, 1);
+    canvas.putChar(1, 0, 'v');
+    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
+    assertEquals('v', canvas.charAt(1, 0));
+  }
+
+  @Test
+  void putCharWithPrecedence_asciiHorizontalLineDoesNotOverwriteArrow() {
+    var canvas = new Canvas(3, 1);
+    canvas.putChar(1, 0, 'v');
+    canvas.putCharWithPrecedence(1, 0, '-');
+    assertEquals('v', canvas.charAt(1, 0));
+  }
+
+  @Test
+  void putCharWithPrecedence_asciiVerticalLineDoesNotOverwriteArrow() {
+    var canvas = new Canvas(3, 1);
+    canvas.putChar(1, 0, 'v');
+    canvas.putCharWithPrecedence(1, 0, '|');
+    assertEquals('v', canvas.charAt(1, 0));
+  }
+
+  @Test
+  void putCharWithPrecedence_cornerDoesNotOverwriteArrow() {
+    var canvas = new Canvas(3, 1);
+    canvas.putChar(1, 0, 'v');
+    canvas.putCharWithPrecedence(1, 0, '\u2510'); // ┐
+    assertEquals('v', canvas.charAt(1, 0));
+  }
+
+  @Test
+  void putCharWithPrecedence_junctionDoesNotOverwriteArrow() {
+    var canvas = new Canvas(3, 1);
+    canvas.putChar(1, 0, 'v');
+    canvas.putCharWithPrecedence(1, 0, '\u252C'); // ┬
+    assertEquals('v', canvas.charAt(1, 0));
+  }
 }

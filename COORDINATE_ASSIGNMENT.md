@@ -84,7 +84,8 @@ startX = (maxLayerWidth - thisLayerWidth) / 2
 ```
 
 Vertices are placed left to right within each layer, separated by a horizontal gap (2 characters). Layers are stacked
-top to bottom, separated by a vertical gap (4 characters) to leave room for edge routing.
+top to bottom, separated by a dynamic vertical gap to leave room for edge routing. The gap is sized to match edge
+density: `clamp(edgeCount, MIN_LAYER_GAP=2, MAX_LAYER_GAP=8)` — see [Edge Routing](EDGE_ROUTING.md) for details.
 
 ### Example Walkthrough: Diamond DAG
 
@@ -105,11 +106,12 @@ Given the diamond graph A→B, A→C, B→D, C→D with layers A=0, {B,C}=1, D=2
 | Vertex | Layer | startX            | x | y  |
 |--------|-------|-------------------|---|----|
 | A      | 0     | (12 - 5) / 2 = 3  | 3 | 0  |
-| B      | 1     | (12 - 12) / 2 = 0 | 0 | 7  |
-| C      | 1     | (after B)         | 7 | 7  |
-| D      | 2     | (12 - 5) / 2 = 3  | 3 | 14 |
+| B      | 1     | (12 - 12) / 2 = 0 | 0 | 5  |
+| C      | 1     | (after B)         | 7 | 5  |
+| D      | 2     | (12 - 5) / 2 = 3  | 3 | 10 |
 
-**Y spacing:** Each layer starts at `previousY + boxHeight + gap` = `previousY + 3 + 4 = previousY + 7`.
+**Y spacing:** Each layer starts at `previousY + boxHeight + gap`. The diamond has 2 edges per gap,
+so each gap = max(2, 2) = 2, giving `previousY + 3 + 2 = previousY + 5`.
 
 **Result on the canvas:**
 
@@ -118,13 +120,9 @@ Given the diamond graph A→B, A→C, B→D, C→D with layers A=0, {B,C}=1, D=2
    │ A │
    └───┘
 
-
-
 ┌───┐ ┌───┐
 │ B │ │ C │
 └───┘ └───┘
-
-
 
    ┌───┐
    │ D │
@@ -133,12 +131,16 @@ Given the diamond graph A→B, A→C, B→D, C→D with layers A=0, {B,C}=1, D=2
 
 ## Configuration
 
-The algorithm uses two spacing constants:
+The algorithm uses the following spacing constants:
 
-| Constant     | Value | Purpose                                           |
-|--------------|-------|---------------------------------------------------|
-| `LAYER_GAP`  | 4     | Vertical gap between layers (for edge routing)    |
-| `VERTEX_GAP` | 2     | Horizontal gap between vertices in the same layer |
+| Constant        | Value | Purpose                                                      |
+|-----------------|-------|--------------------------------------------------------------|
+| `MIN_LAYER_GAP` | 2     | Minimum vertical gap between layers (sparse edges)           |
+| `MAX_LAYER_GAP` | 8     | Maximum vertical gap between layers (dense edges)            |
+| `VERTEX_GAP`    | 2     | Horizontal gap between vertices in the same layer            |
+
+The vertical gap between each pair of adjacent layers is dynamic: `clamp(edgeCount, MIN_LAYER_GAP, MAX_LAYER_GAP)`,
+where `edgeCount` is the number of edges crossing that gap in the split graph.
 
 ## Output
 

@@ -170,7 +170,8 @@ public class OrthogonalEdgeRouter implements EdgeRouter {
     }
 
     int currentY = startY;
-    for (GridVertex<V> obstacle : collisions) {
+    for (int ci = 0; ci < collisions.size(); ci++) {
+      GridVertex<V> obstacle = collisions.get(ci);
       int channelAbove = obstacle.y() - 1;
       int channelBelow = obstacle.y() + BOX_HEIGHT;
 
@@ -184,12 +185,13 @@ public class OrthogonalEdgeRouter implements EdgeRouter {
       int minDetourX = Math.min(x, detourX);
       int maxDetourX = Math.max(x, detourX);
 
+      // Cap the search window for channelBelow at the next vertex boundary
+      int maxBelowY = (ci + 1 < collisions.size()) ? collisions.get(ci + 1).y() - 1 : targetY;
+
       // Use lane tracker to find free rows for the horizontal detour segments
       channelAbove =
           laneTracker.findFreeRow(channelAbove, obstacle.y() - 1, minDetourX, maxDetourX);
-      channelBelow =
-          laneTracker.findFreeRow(
-              channelBelow, channelBelow + BOX_HEIGHT - 1, minDetourX, maxDetourX);
+      channelBelow = laneTracker.findFreeRow(channelBelow, maxBelowY, minDetourX, maxDetourX);
 
       // Horizontal move to detour column
       path.add(new int[] {detourX, channelAbove});
