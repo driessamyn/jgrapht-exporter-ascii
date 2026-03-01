@@ -3,7 +3,10 @@ on:
   push:
     branches:
       - main
-      - 'release/*'
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -12,6 +15,9 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'push' ||
+      github.event.workflow_run.conclusion == 'success'
     env:
       GH_USER: driessamyn
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -21,6 +27,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Checkout latest release tag
+        if: github.event_name == 'workflow_run'
+        run: |
+          TAG=$(git tag --sort=-version:refname | head -1)
+          echo "Checking out $TAG"
+          git checkout "$TAG"
       - uses: actions/setup-java@v4
         with:
           java-version: '21'

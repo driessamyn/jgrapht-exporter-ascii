@@ -1,8 +1,9 @@
 name: Publish JAR to Maven Central
 on:
-  push:
-    branches:
-      - 'release/*'
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -10,19 +11,25 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     env:
       MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
       MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
       GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
       GPG_SIGNING_PASSPHRASE: ${{ secrets.GPG_SIGNING_PASSPHRASE }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Checkout latest release tag
+        run: |
+          TAG=$(git tag --sort=-version:refname | head -1)
+          echo "Checking out $TAG"
+          git checkout "$TAG"
       - uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'zulu'
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Publish package

@@ -27,30 +27,28 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Create release commit
+      - name: Create release version
         run: |
-          git commit --allow-empty -m "build: release"
+          ./gradlew releaseVersion
 
       - name: Get version
         id: version
         run: |
-          VERSION=$(./gradlew printVersion -q)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          TAG=$(git describe --tags --exact-match HEAD)
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Tag release
+      - name: Push release branch and tag
         run: |
-          git tag "v${{ steps.version.outputs.version }}"
-
-      - name: Push commit and tag
-        run: |
-          git push origin HEAD
-          git push origin "v${{ steps.version.outputs.version }}"
+          BRANCH="release/${{ steps.version.outputs.tag }}"
+          git checkout -B "$BRANCH"
+          git push --force origin "$BRANCH"
+          git push --force origin "${{ steps.version.outputs.tag }}"
 
       - name: Create GitHub Release
         run: |
           ./gradlew printChangeLog -q | \
-            gh release create "v${{ steps.version.outputs.version }}" \
-              --title "v${{ steps.version.outputs.version }}" \
+            gh release create "${{ steps.version.outputs.tag }}" \
+              --title "${{ steps.version.outputs.tag }}" \
               --notes-file - \
               --draft
         env:

@@ -6,6 +6,8 @@ plugins {
 
 semver {
     releasePattern = "\\Abuild: release"
+    releaseCommitTextFormat = "build: release %s\n\n%s"
+    releaseTagNameFormat = "v%s"
 }
 
 repositories {
