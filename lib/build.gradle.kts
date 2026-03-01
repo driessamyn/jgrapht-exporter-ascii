@@ -1,5 +1,6 @@
 plugins {
     id("jgrapht-ascii.library-conventions")
+    id("jgrapht-ascii.library-publish")
 }
 
 dependencies {
