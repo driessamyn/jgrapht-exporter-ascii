@@ -117,6 +117,106 @@ class CanvasTest {
     assertEquals('v', canvas.charAt(1, 0));
   }
 
+  // --- Corner + line → junction merge tests (Unicode) ---
+
+  @Test
+  void putCharWithPrecedence_topLeftCornerOnVerticalLineProducesLeftTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
+    canvas.putCharWithPrecedence(1, 0, '\u250C'); // ┌
+    assertEquals('\u251C', canvas.charAt(1, 0)); // ├
+  }
+
+  @Test
+  void putCharWithPrecedence_topRightCornerOnVerticalLineProducesRightTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
+    canvas.putCharWithPrecedence(1, 0, '\u2510'); // ┐
+    assertEquals('\u2524', canvas.charAt(1, 0)); // ┤
+  }
+
+  @Test
+  void putCharWithPrecedence_bottomLeftCornerOnVerticalLineProducesLeftTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
+    canvas.putCharWithPrecedence(1, 0, '\u2514'); // └
+    assertEquals('\u251C', canvas.charAt(1, 0)); // ├
+  }
+
+  @Test
+  void putCharWithPrecedence_bottomRightCornerOnVerticalLineProducesRightTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
+    canvas.putCharWithPrecedence(1, 0, '\u2518'); // ┘
+    assertEquals('\u2524', canvas.charAt(1, 0)); // ┤
+  }
+
+  @Test
+  void putCharWithPrecedence_topLeftCornerOnHorizontalLineProducesDownTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
+    canvas.putCharWithPrecedence(1, 0, '\u250C'); // ┌
+    assertEquals('\u252C', canvas.charAt(1, 0)); // ┬
+  }
+
+  @Test
+  void putCharWithPrecedence_topRightCornerOnHorizontalLineProducesDownTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
+    canvas.putCharWithPrecedence(1, 0, '\u2510'); // ┐
+    assertEquals('\u252C', canvas.charAt(1, 0)); // ┬
+  }
+
+  @Test
+  void putCharWithPrecedence_bottomLeftCornerOnHorizontalLineProducesUpTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
+    canvas.putCharWithPrecedence(1, 0, '\u2514'); // └
+    assertEquals('\u2534', canvas.charAt(1, 0)); // ┴
+  }
+
+  @Test
+  void putCharWithPrecedence_bottomRightCornerOnHorizontalLineProducesUpTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
+    canvas.putCharWithPrecedence(1, 0, '\u2518'); // ┘
+    assertEquals('\u2534', canvas.charAt(1, 0)); // ┴
+  }
+
+  // --- Line on existing corner → junction merge tests ---
+
+  @Test
+  void putCharWithPrecedence_verticalLineOnTopLeftCornerProducesLeftTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u250C'); // ┌
+    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
+    assertEquals('\u251C', canvas.charAt(1, 0)); // ├
+  }
+
+  @Test
+  void putCharWithPrecedence_verticalLineOnTopRightCornerProducesRightTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u2510'); // ┐
+    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
+    assertEquals('\u2524', canvas.charAt(1, 0)); // ┤
+  }
+
+  @Test
+  void putCharWithPrecedence_horizontalLineOnTopLeftCornerProducesDownTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u250C'); // ┌
+    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
+    assertEquals('\u252C', canvas.charAt(1, 0)); // ┬
+  }
+
+  @Test
+  void putCharWithPrecedence_horizontalLineOnBottomLeftCornerProducesUpTee() {
+    var canvas = new Canvas(3, 1);
+    canvas.putCharWithPrecedence(1, 0, '\u2514'); // └
+    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
+    assertEquals('\u2534', canvas.charAt(1, 0)); // ┴
+  }
+
   @Test
   void putCharWithPrecedence_cornerDoesNotOverwriteArrow() {
     var canvas = new Canvas(3, 1);
