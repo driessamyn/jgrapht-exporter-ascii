@@ -80,12 +80,28 @@ public class Canvas {
       return;
     }
 
+    // --- Corner + line merging into T-junctions ---
+    if (isUnicodeCorner(newChar) && isUnicodeVerticalLine(existingChar)) {
+      grid[y][x] = hasRightLeg(newChar) ? '\u251C' : '\u2524'; // ├ or ┤
+      return;
+    }
+    if (isUnicodeCorner(newChar) && isUnicodeHorizontalLine(existingChar)) {
+      grid[y][x] = hasTopLeg(newChar) ? '\u2534' : '\u252C'; // ┴ or ┬
+      return;
+    }
+    if (isUnicodeVerticalLine(newChar) && isUnicodeCorner(existingChar)) {
+      grid[y][x] = hasRightLeg(existingChar) ? '\u251C' : '\u2524'; // ├ or ┤
+      return;
+    }
+    if (isUnicodeHorizontalLine(newChar) && isUnicodeCorner(existingChar)) {
+      grid[y][x] = hasTopLeg(existingChar) ? '\u2534' : '\u252C'; // ┴ or ┬
+      return;
+    }
+
     // --- Precedence: Junctions/Corners over Lines ---
-    // If new char is a line and existing is a stronger junction/corner, preserve existing
     if (isLine(newChar) && isJunctionOrCorner(existingChar)) {
       return;
     }
-    // If new char is a junction/corner and existing is a line, overwrite with new char
     if (isJunctionOrCorner(newChar) && isLine(existingChar)) {
       grid[y][x] = newChar;
       return;
@@ -152,6 +168,16 @@ public class Canvas {
 
   private static boolean isJunctionOrCorner(char c) { // General check
     return isJunction(c) || isCorner(c);
+  }
+
+  /** Returns true if the corner has a leg extending to the right (┌ or └). */
+  private static boolean hasRightLeg(char c) {
+    return c == '\u250C' || c == '\u2514'; // ┌ └
+  }
+
+  /** Returns true if the corner has a leg extending upward (└ or ┘). */
+  private static boolean hasTopLeg(char c) {
+    return c == '\u2514' || c == '\u2518'; // └ ┘
   }
 
   private static boolean isArrow(char c) {

@@ -61,4 +61,14 @@ The export pipeline follows the Sugiyama framework:
 - `org.junit.jupiter:junit-jupiter:5.11.4` - Testing framework
 - Gradle 9.0.0 with JDK 21 toolchain, Java 11 bytecode target
 
+## Contribution Guidelines
+
+- **TDD** — always write or update tests first; ensure high test coverage
+- **SOLID principles** — all code must adhere to SOLID
+- **Javadoc** — all public API must have Javadoc comments
+- **Minimal comments** — code should be self-explanatory where possible; when comments are needed, focus on "why", not "what"
+- **No test ceremony** — tests should never have given/when/then or arrange/act/assert comments; the structure should be obvious from the code
+- **No extra dependencies** — do not introduce any third-party dependencies beyond the JGraphT library
+- **British English** — everywhere: code, comments, documentation, commit messages
+
 <!-- MANUAL: Any manually added notes below this line are preserved on regeneration -->
