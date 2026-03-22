@@ -13,12 +13,15 @@ public final class GridVertex<V> {
 
   private static final int HORIZONTAL_PADDING = 2;
   private static final int BORDER_WIDTH = 2;
-  private static final int BOX_HEIGHT = 3;
+
+  /** Height of a vertex box (top border + label row + bottom border). */
+  public static final int BOX_HEIGHT = 3;
 
   private final V vertex;
   private final String label;
   private final int x;
   private final int y;
+  private final int cachedWidth;
 
   public GridVertex(V vertex, String label, int x, int y) {
     this.vertex = vertex;
@@ -26,6 +29,7 @@ public final class GridVertex<V> {
     this.label = Objects.requireNonNullElse(label, "");
     this.x = x;
     this.y = y;
+    this.cachedWidth = DisplayWidth.width(this.label) + HORIZONTAL_PADDING + BORDER_WIDTH;
   }
 
   /** Returns the original graph vertex. */
@@ -47,7 +51,7 @@ public final class GridVertex<V> {
 
   /** Total width of the rendered box including borders and padding. */
   public int width() {
-    return DisplayWidth.width(label) + HORIZONTAL_PADDING + BORDER_WIDTH;
+    return cachedWidth;
   }
 
   /** Horizontal centre of the rendered box (the column where edges attach). */

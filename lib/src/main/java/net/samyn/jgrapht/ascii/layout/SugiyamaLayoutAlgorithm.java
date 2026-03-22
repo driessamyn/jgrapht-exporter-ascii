@@ -29,8 +29,7 @@ import org.jgrapht.graph.DefaultEdge;
  */
 public class SugiyamaLayoutAlgorithm<V, E> implements LayoutAlgorithm<V, E> {
 
-  /** Height of a vertex box (top border + label row + bottom border). */
-  private static final int BOX_HEIGHT = 3;
+  private static final int BOX_HEIGHT = GridVertex.BOX_HEIGHT;
 
   /** Minimum vertical gap between layers (used when few edges cross the gap). */
   private static final int MIN_LAYER_GAP = 2;
