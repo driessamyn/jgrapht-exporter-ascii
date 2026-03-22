@@ -1,5 +1,7 @@
 package net.samyn.jgrapht.ascii.render;
 
+import static net.samyn.jgrapht.ascii.model.BoxDrawing.*;
+
 import java.util.List;
 import net.samyn.jgrapht.ascii.model.Canvas;
 import net.samyn.jgrapht.ascii.model.DisplayWidth;
@@ -24,25 +26,25 @@ public class UnicodeBoxRenderer implements CanvasRenderer {
     int innerWidth = vertex.width() - 2;
 
     // Top border: ┌───┐
-    canvas.putChar(x, y, '\u250C');
+    canvas.putChar(x, y, TOP_LEFT);
     for (int i = 0; i < innerWidth; i++) {
-      canvas.putChar(x + 1 + i, y, '\u2500');
+      canvas.putChar(x + 1 + i, y, HORIZONTAL);
     }
-    canvas.putChar(x + innerWidth + 1, y, '\u2510');
+    canvas.putChar(x + innerWidth + 1, y, TOP_RIGHT);
 
     // Label row: │ label │
-    canvas.putChar(x, y + 1, '\u2502');
+    canvas.putChar(x, y + 1, VERTICAL);
     canvas.putChar(x + 1, y + 1, ' ');
     canvas.putString(x + 2, y + 1, vertex.label());
     canvas.putChar(x + 2 + DisplayWidth.width(vertex.label()), y + 1, ' ');
-    canvas.putChar(x + innerWidth + 1, y + 1, '\u2502');
+    canvas.putChar(x + innerWidth + 1, y + 1, VERTICAL);
 
     // Bottom border: └───┘
-    canvas.putChar(x, y + 2, '\u2514');
+    canvas.putChar(x, y + 2, BOTTOM_LEFT);
     for (int i = 0; i < innerWidth; i++) {
-      canvas.putChar(x + 1 + i, y + 2, '\u2500');
+      canvas.putChar(x + 1 + i, y + 2, HORIZONTAL);
     }
-    canvas.putChar(x + innerWidth + 1, y + 2, '\u2518');
+    canvas.putChar(x + innerWidth + 1, y + 2, BOTTOM_RIGHT);
   }
 
   @Override
@@ -58,11 +60,10 @@ public class UnicodeBoxRenderer implements CanvasRenderer {
     boolean drewJunction = false;
     // If current char is a horizontal line, convert to a T-junction.
     // If it's already a junction or cross, consider it drawn.
-    if (existingAtFirstWaypoint == '\u2500') { // ─ (horizontal border)
-      canvas.putChar(first[0], first[1], '\u252C'); // ┬ (T-junction down)
+    if (existingAtFirstWaypoint == HORIZONTAL) {
+      canvas.putChar(first[0], first[1], TEE_DOWN);
       drewJunction = true;
-    } else if (existingAtFirstWaypoint == '\u252C' // ┬ (T-junction down)
-        || existingAtFirstWaypoint == '\u253C') { // ┼ (Cross junction)
+    } else if (existingAtFirstWaypoint == TEE_DOWN || existingAtFirstWaypoint == CROSS) {
       // Already a junction that a vertical line can pass through
       drewJunction = true;
     }
@@ -81,7 +82,7 @@ public class UnicodeBoxRenderer implements CanvasRenderer {
           if (drewJunction && i == 0 && y == y1) {
             continue; // skip — already drawn as junction
           }
-          canvas.putCharWithPrecedence(x1, y, '\u2502'); // │
+          canvas.putCharWithPrecedence(x1, y, VERTICAL);
         }
       } else if (y1 == y2) {
         // Horizontal segment
@@ -91,7 +92,7 @@ public class UnicodeBoxRenderer implements CanvasRenderer {
           if (drewJunction && i == 0 && cx == x1) {
             continue; // skip — already drawn as junction
           }
-          canvas.putCharWithPrecedence(cx, y1, '\u2500'); // ─
+          canvas.putCharWithPrecedence(cx, y1, HORIZONTAL);
         }
       }
     }
@@ -113,17 +114,17 @@ public class UnicodeBoxRenderer implements CanvasRenderer {
       }
 
       if (prevX < curX && nextY > curY) {
-        canvas.putCharWithPrecedence(curX, curY, '\u2510'); // ┐ (came from left, going down)
+        canvas.putCharWithPrecedence(curX, curY, TOP_RIGHT); // ┐ (came from left, going down)
       } else if (prevX > curX && nextY > curY) {
-        canvas.putCharWithPrecedence(curX, curY, '\u250C'); // ┌ (came from right, going down)
+        canvas.putCharWithPrecedence(curX, curY, TOP_LEFT); // ┌ (came from right, going down)
       } else if (prevY < curY && nextX > curX) {
-        canvas.putCharWithPrecedence(curX, curY, '\u2514'); // └ (came from above, going right)
+        canvas.putCharWithPrecedence(curX, curY, BOTTOM_LEFT); // └ (came from above, going right)
       } else if (prevY < curY && nextX < curX) {
-        canvas.putCharWithPrecedence(curX, curY, '\u2518'); // ┘ (came from above, going left)
+        canvas.putCharWithPrecedence(curX, curY, BOTTOM_RIGHT); // ┘ (came from above, going left)
       } else if (prevY > curY && nextX > curX) {
-        canvas.putCharWithPrecedence(curX, curY, '\u250C'); // ┌ (came from below, going right)
+        canvas.putCharWithPrecedence(curX, curY, TOP_LEFT); // ┌ (came from below, going right)
       } else if (prevY > curY && nextX < curX) {
-        canvas.putCharWithPrecedence(curX, curY, '\u2510'); // ┐ (came from below, going left)
+        canvas.putCharWithPrecedence(curX, curY, TOP_RIGHT); // ┐ (came from below, going left)
       }
     }
 

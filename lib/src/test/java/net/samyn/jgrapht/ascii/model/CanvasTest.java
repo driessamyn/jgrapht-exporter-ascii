@@ -1,5 +1,6 @@
 package net.samyn.jgrapht.ascii.model;
 
+import static net.samyn.jgrapht.ascii.model.BoxDrawing.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
@@ -89,7 +90,7 @@ class CanvasTest {
   void putCharWithPrecedence_horizontalLineDoesNotOverwriteArrow() {
     var canvas = new Canvas(3, 1);
     canvas.putChar(1, 0, 'v');
-    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
+    canvas.putCharWithPrecedence(1, 0, HORIZONTAL); // ─
     assertEquals('v', canvas.charAt(1, 0));
   }
 
@@ -97,7 +98,7 @@ class CanvasTest {
   void putCharWithPrecedence_verticalLineDoesNotOverwriteArrow() {
     var canvas = new Canvas(3, 1);
     canvas.putChar(1, 0, 'v');
-    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
+    canvas.putCharWithPrecedence(1, 0, VERTICAL); // │
     assertEquals('v', canvas.charAt(1, 0));
   }
 
@@ -122,65 +123,65 @@ class CanvasTest {
   @Test
   void putCharWithPrecedence_topLeftCornerOnVerticalLineProducesLeftTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
-    canvas.putCharWithPrecedence(1, 0, '\u250C'); // ┌
-    assertEquals('\u251C', canvas.charAt(1, 0)); // ├
+    canvas.putCharWithPrecedence(1, 0, VERTICAL); // │
+    canvas.putCharWithPrecedence(1, 0, TOP_LEFT); // ┌
+    assertEquals(TEE_RIGHT, canvas.charAt(1, 0)); // ├
   }
 
   @Test
   void putCharWithPrecedence_topRightCornerOnVerticalLineProducesRightTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
-    canvas.putCharWithPrecedence(1, 0, '\u2510'); // ┐
-    assertEquals('\u2524', canvas.charAt(1, 0)); // ┤
+    canvas.putCharWithPrecedence(1, 0, VERTICAL); // │
+    canvas.putCharWithPrecedence(1, 0, TOP_RIGHT); // ┐
+    assertEquals(TEE_LEFT, canvas.charAt(1, 0)); // ┤
   }
 
   @Test
   void putCharWithPrecedence_bottomLeftCornerOnVerticalLineProducesLeftTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
-    canvas.putCharWithPrecedence(1, 0, '\u2514'); // └
-    assertEquals('\u251C', canvas.charAt(1, 0)); // ├
+    canvas.putCharWithPrecedence(1, 0, VERTICAL); // │
+    canvas.putCharWithPrecedence(1, 0, BOTTOM_LEFT); // └
+    assertEquals(TEE_RIGHT, canvas.charAt(1, 0)); // ├
   }
 
   @Test
   void putCharWithPrecedence_bottomRightCornerOnVerticalLineProducesRightTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
-    canvas.putCharWithPrecedence(1, 0, '\u2518'); // ┘
-    assertEquals('\u2524', canvas.charAt(1, 0)); // ┤
+    canvas.putCharWithPrecedence(1, 0, VERTICAL); // │
+    canvas.putCharWithPrecedence(1, 0, BOTTOM_RIGHT); // ┘
+    assertEquals(TEE_LEFT, canvas.charAt(1, 0)); // ┤
   }
 
   @Test
   void putCharWithPrecedence_topLeftCornerOnHorizontalLineProducesDownTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
-    canvas.putCharWithPrecedence(1, 0, '\u250C'); // ┌
-    assertEquals('\u252C', canvas.charAt(1, 0)); // ┬
+    canvas.putCharWithPrecedence(1, 0, HORIZONTAL); // ─
+    canvas.putCharWithPrecedence(1, 0, TOP_LEFT); // ┌
+    assertEquals(TEE_DOWN, canvas.charAt(1, 0)); // ┬
   }
 
   @Test
   void putCharWithPrecedence_topRightCornerOnHorizontalLineProducesDownTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
-    canvas.putCharWithPrecedence(1, 0, '\u2510'); // ┐
-    assertEquals('\u252C', canvas.charAt(1, 0)); // ┬
+    canvas.putCharWithPrecedence(1, 0, HORIZONTAL); // ─
+    canvas.putCharWithPrecedence(1, 0, TOP_RIGHT); // ┐
+    assertEquals(TEE_DOWN, canvas.charAt(1, 0)); // ┬
   }
 
   @Test
   void putCharWithPrecedence_bottomLeftCornerOnHorizontalLineProducesUpTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
-    canvas.putCharWithPrecedence(1, 0, '\u2514'); // └
-    assertEquals('\u2534', canvas.charAt(1, 0)); // ┴
+    canvas.putCharWithPrecedence(1, 0, HORIZONTAL); // ─
+    canvas.putCharWithPrecedence(1, 0, BOTTOM_LEFT); // └
+    assertEquals(TEE_UP, canvas.charAt(1, 0)); // ┴
   }
 
   @Test
   void putCharWithPrecedence_bottomRightCornerOnHorizontalLineProducesUpTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
-    canvas.putCharWithPrecedence(1, 0, '\u2518'); // ┘
-    assertEquals('\u2534', canvas.charAt(1, 0)); // ┴
+    canvas.putCharWithPrecedence(1, 0, HORIZONTAL); // ─
+    canvas.putCharWithPrecedence(1, 0, BOTTOM_RIGHT); // ┘
+    assertEquals(TEE_UP, canvas.charAt(1, 0)); // ┴
   }
 
   // --- Line on existing corner → junction merge tests ---
@@ -188,40 +189,40 @@ class CanvasTest {
   @Test
   void putCharWithPrecedence_verticalLineOnTopLeftCornerProducesLeftTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u250C'); // ┌
-    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
-    assertEquals('\u251C', canvas.charAt(1, 0)); // ├
+    canvas.putCharWithPrecedence(1, 0, TOP_LEFT); // ┌
+    canvas.putCharWithPrecedence(1, 0, VERTICAL); // │
+    assertEquals(TEE_RIGHT, canvas.charAt(1, 0)); // ├
   }
 
   @Test
   void putCharWithPrecedence_verticalLineOnTopRightCornerProducesRightTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u2510'); // ┐
-    canvas.putCharWithPrecedence(1, 0, '\u2502'); // │
-    assertEquals('\u2524', canvas.charAt(1, 0)); // ┤
+    canvas.putCharWithPrecedence(1, 0, TOP_RIGHT); // ┐
+    canvas.putCharWithPrecedence(1, 0, VERTICAL); // │
+    assertEquals(TEE_LEFT, canvas.charAt(1, 0)); // ┤
   }
 
   @Test
   void putCharWithPrecedence_horizontalLineOnTopLeftCornerProducesDownTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u250C'); // ┌
-    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
-    assertEquals('\u252C', canvas.charAt(1, 0)); // ┬
+    canvas.putCharWithPrecedence(1, 0, TOP_LEFT); // ┌
+    canvas.putCharWithPrecedence(1, 0, HORIZONTAL); // ─
+    assertEquals(TEE_DOWN, canvas.charAt(1, 0)); // ┬
   }
 
   @Test
   void putCharWithPrecedence_horizontalLineOnBottomLeftCornerProducesUpTee() {
     var canvas = new Canvas(3, 1);
-    canvas.putCharWithPrecedence(1, 0, '\u2514'); // └
-    canvas.putCharWithPrecedence(1, 0, '\u2500'); // ─
-    assertEquals('\u2534', canvas.charAt(1, 0)); // ┴
+    canvas.putCharWithPrecedence(1, 0, BOTTOM_LEFT); // └
+    canvas.putCharWithPrecedence(1, 0, HORIZONTAL); // ─
+    assertEquals(TEE_UP, canvas.charAt(1, 0)); // ┴
   }
 
   @Test
   void putCharWithPrecedence_cornerDoesNotOverwriteArrow() {
     var canvas = new Canvas(3, 1);
     canvas.putChar(1, 0, 'v');
-    canvas.putCharWithPrecedence(1, 0, '\u2510'); // ┐
+    canvas.putCharWithPrecedence(1, 0, TOP_RIGHT); // ┐
     assertEquals('v', canvas.charAt(1, 0));
   }
 
@@ -229,7 +230,7 @@ class CanvasTest {
   void putCharWithPrecedence_junctionDoesNotOverwriteArrow() {
     var canvas = new Canvas(3, 1);
     canvas.putChar(1, 0, 'v');
-    canvas.putCharWithPrecedence(1, 0, '\u252C'); // ┬
+    canvas.putCharWithPrecedence(1, 0, TEE_DOWN); // ┬
     assertEquals('v', canvas.charAt(1, 0));
   }
 }

@@ -1,5 +1,7 @@
 package net.samyn.jgrapht.ascii.model;
 
+import static net.samyn.jgrapht.ascii.model.BoxDrawing.*;
+
 import java.util.Arrays;
 
 /**
@@ -71,7 +73,7 @@ public class Canvas {
     // --- Line crossing line to form a cross ---
     if ((isUnicodeHorizontalLine(existingChar) && isUnicodeVerticalLine(newChar))
         || (isUnicodeVerticalLine(existingChar) && isUnicodeHorizontalLine(newChar))) {
-      grid[y][x] = '\u253C'; // ┼
+      grid[y][x] = CROSS;
       return;
     }
     if ((isAsciiHorizontalLine(existingChar) && isAsciiVerticalLine(newChar))
@@ -82,19 +84,19 @@ public class Canvas {
 
     // --- Corner + line merging into T-junctions ---
     if (isUnicodeCorner(newChar) && isUnicodeVerticalLine(existingChar)) {
-      grid[y][x] = hasRightLeg(newChar) ? '\u251C' : '\u2524'; // ├ or ┤
+      grid[y][x] = hasRightLeg(newChar) ? TEE_RIGHT : TEE_LEFT;
       return;
     }
     if (isUnicodeCorner(newChar) && isUnicodeHorizontalLine(existingChar)) {
-      grid[y][x] = hasTopLeg(newChar) ? '\u2534' : '\u252C'; // ┴ or ┬
+      grid[y][x] = hasTopLeg(newChar) ? TEE_UP : TEE_DOWN;
       return;
     }
     if (isUnicodeVerticalLine(newChar) && isUnicodeCorner(existingChar)) {
-      grid[y][x] = hasRightLeg(existingChar) ? '\u251C' : '\u2524'; // ├ or ┤
+      grid[y][x] = hasRightLeg(existingChar) ? TEE_RIGHT : TEE_LEFT;
       return;
     }
     if (isUnicodeHorizontalLine(newChar) && isUnicodeCorner(existingChar)) {
-      grid[y][x] = hasTopLeg(existingChar) ? '\u2534' : '\u252C'; // ┴ or ┬
+      grid[y][x] = hasTopLeg(existingChar) ? TEE_UP : TEE_DOWN;
       return;
     }
 
@@ -120,11 +122,11 @@ public class Canvas {
   }
 
   private static boolean isUnicodeHorizontalLine(char c) {
-    return c == '\u2500' || c == '\u2501'; // ─ or ━
+    return c == HORIZONTAL || c == HORIZONTAL_BOLD;
   }
 
   private static boolean isUnicodeVerticalLine(char c) {
-    return c == '\u2502' || c == '\u2503'; // │ or ┃
+    return c == VERTICAL || c == VERTICAL_BOLD;
   }
 
   private static boolean isAsciiHorizontalLine(char c) {
@@ -143,7 +145,7 @@ public class Canvas {
   }
 
   private static boolean isUnicodeJunction(char c) {
-    return c == '\u252C' || c == '\u2534' || c == '\u251C' || c == '\u2524' || c == '\u253C';
+    return c == TEE_DOWN || c == TEE_UP || c == TEE_RIGHT || c == TEE_LEFT || c == CROSS;
   }
 
   private static boolean isAsciiJunction(char c) {
@@ -155,7 +157,7 @@ public class Canvas {
   }
 
   private static boolean isUnicodeCorner(char c) {
-    return c == '\u250C' || c == '\u2510' || c == '\u2514' || c == '\u2518';
+    return c == TOP_LEFT || c == TOP_RIGHT || c == BOTTOM_LEFT || c == BOTTOM_RIGHT;
   }
 
   private static boolean isAsciiCorner(char c) {
@@ -172,12 +174,12 @@ public class Canvas {
 
   /** Returns true if the corner has a leg extending to the right (┌ or └). */
   private static boolean hasRightLeg(char c) {
-    return c == '\u250C' || c == '\u2514'; // ┌ └
+    return c == TOP_LEFT || c == BOTTOM_LEFT;
   }
 
   /** Returns true if the corner has a leg extending upward (└ or ┘). */
   private static boolean hasTopLeg(char c) {
-    return c == '\u2514' || c == '\u2518'; // └ ┘
+    return c == BOTTOM_LEFT || c == BOTTOM_RIGHT;
   }
 
   private static boolean isArrow(char c) {
