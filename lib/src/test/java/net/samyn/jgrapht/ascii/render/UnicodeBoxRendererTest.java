@@ -1,5 +1,6 @@
 package net.samyn.jgrapht.ascii.render;
 
+import static net.samyn.jgrapht.ascii.model.BoxDrawing.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
@@ -49,7 +50,7 @@ class UnicodeBoxRendererTest {
         new GridEdge<>("A", "B", sourceGv, targetGv, List.of(new int[] {2, 2}, new int[] {2, 4}));
     renderer.renderEdge(canvas, edge);
 
-    assertEquals('\u2502', canvas.charAt(2, 3)); // │ in the gap
+    assertEquals(VERTICAL, canvas.charAt(2, 3));
     assertEquals('v', canvas.charAt(2, 4)); // arrow at last waypoint
   }
 
@@ -68,8 +69,8 @@ class UnicodeBoxRendererTest {
     renderer.renderEdge(canvas, edge);
 
     // Junction on bottom border
-    assertEquals('\u252C', canvas.charAt(2, 2)); // ┬
-    assertEquals('\u2502', canvas.charAt(2, 3)); // │
+    assertEquals(TEE_DOWN, canvas.charAt(2, 2));
+    assertEquals(VERTICAL, canvas.charAt(2, 3));
     assertEquals('v', canvas.charAt(2, 4));
   }
 
@@ -89,14 +90,14 @@ class UnicodeBoxRendererTest {
     renderer.renderEdge(canvas, edge);
 
     // Vertical segment from border
-    assertEquals('\u2502', canvas.charAt(2, 2)); // │ at start (no border to junction with)
+    assertEquals(VERTICAL, canvas.charAt(2, 2));
     // Corner at first bend (vertical to horizontal)
-    assertEquals('\u2514', canvas.charAt(2, 3)); // └ (from above, going right)
+    assertEquals(BOTTOM_LEFT, canvas.charAt(2, 3));
     // Horizontal segment
-    assertEquals('\u2500', canvas.charAt(3, 3)); // ─
-    assertEquals('\u2500', canvas.charAt(7, 3)); // ─
+    assertEquals(HORIZONTAL, canvas.charAt(3, 3));
+    assertEquals(HORIZONTAL, canvas.charAt(7, 3));
     // Corner at second bend (horizontal to vertical)
-    assertEquals('\u2510', canvas.charAt(8, 3)); // ┐ (from left, going down)
+    assertEquals(TOP_RIGHT, canvas.charAt(8, 3));
     // Arrow
     assertEquals('v', canvas.charAt(8, 4));
   }
