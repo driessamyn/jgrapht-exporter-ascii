@@ -35,7 +35,7 @@ public class SugiyamaLayoutAlgorithm<V, E> implements LayoutAlgorithm<V, E> {
   private static final int MIN_LAYER_GAP = 2;
 
   /** Maximum vertical gap between layers (caps dense gaps to prevent excessive spacing). */
-  private static final int MAX_LAYER_GAP = 8;
+  private static final int MAX_LAYER_GAP = 12;
 
   /** Horizontal gap between adjacent vertex boxes within a layer. */
   private static final int VERTEX_GAP = 2;
@@ -125,7 +125,8 @@ public class SugiyamaLayoutAlgorithm<V, E> implements LayoutAlgorithm<V, E> {
         }
       }
       for (int i = 0; i < gapSizes.length; i++) {
-        gapSizes[i] = Math.max(MIN_LAYER_GAP, Math.min(edgeCounts[i], MAX_LAYER_GAP));
+        // Each edge needs ~2 rows (1 for the segment + 1 gap for visual spacing)
+        gapSizes[i] = Math.max(MIN_LAYER_GAP, Math.min(edgeCounts[i] * 2, MAX_LAYER_GAP));
       }
     }
 

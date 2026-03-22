@@ -35,10 +35,19 @@ class LaneTracker {
 
   /**
    * Starting from {@code candidateY}, search downward (up to {@code maxY}) for the first row not
-   * occupied in [minX, maxX]. Returns {@code candidateY} if already free, or {@code candidateY} as
-   * a fallback if all rows up to {@code maxY} are occupied.
+   * occupied in [minX, maxX] that also has no adjacent occupied rows in the same x-range. This
+   * ensures at least one blank row between horizontal edge segments for visual clarity. Returns
+   * {@code candidateY} as a fallback if all rows up to {@code maxY} are occupied.
    */
   int findFreeRow(int candidateY, int maxY, int minX, int maxX) {
+    for (int y = candidateY; y <= maxY; y++) {
+      if (!isOccupied(y, minX, maxX)
+          && !isOccupied(y - 1, minX, maxX)
+          && !isOccupied(y + 1, minX, maxX)) {
+        return y;
+      }
+    }
+    // Fallback: accept any unoccupied row without the adjacency constraint
     for (int y = candidateY; y <= maxY; y++) {
       if (!isOccupied(y, minX, maxX)) {
         return y;

@@ -246,12 +246,13 @@ class SugiyamaLayoutAlgorithmTest {
 
     GridModel<String> withBypass = layout.layout(graphWith);
 
-    // Dummy vertices should not affect real vertex positions
+    // Dummy vertices should not affect real vertex x-positions (horizontal layout).
+    // Y-positions may shift because the bypass edge changes inter-layer edge density,
+    // which affects the dynamic gap sizing.
     for (String name : List.of("A", "B", "C")) {
       GridVertex<String> expected = findByLabel(withoutBypass.vertices(), name);
       GridVertex<String> actual = findByLabel(withBypass.vertices(), name);
       assertEquals(expected.x(), actual.x(), "x position of " + name + " should not drift");
-      assertEquals(expected.y(), actual.y(), "y position of " + name + " should not drift");
     }
   }
 
@@ -357,11 +358,11 @@ class SugiyamaLayoutAlgorithmTest {
     GridModel<String> result = layout.layout(graph);
     List<GridVertex<String>> sorted = result.verticesByLayer();
 
-    // BOX_HEIGHT = 3, gap = max(2, 5) = 5 → layer 1 at y = 8
+    // BOX_HEIGHT = 3, gap = max(2, min(5*2, 12)) = 10 → layer 1 at y = 13
     GridVertex<String> a = findByLabel(sorted, "A");
     GridVertex<String> b = findByLabel(sorted, "B");
     assertEquals(0, a.y());
-    assertEquals(8, b.y());
+    assertEquals(13, b.y());
   }
 
   private DefaultDirectedGraph<String, DefaultEdge> directedGraph() {

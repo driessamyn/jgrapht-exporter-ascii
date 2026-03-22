@@ -122,7 +122,9 @@ public class OrthogonalEdgeRouter implements EdgeRouter {
     List<int[]> path = new ArrayList<>();
     path.add(new int[] {startX, startY});
 
-    int adjustedEndY = endY - 1;
+    // Ensure at least 2 rows of vertical approach before the arrowhead when there is
+    // sufficient space. This makes the downward arrow direction visually unambiguous.
+    int adjustedEndY = (endY - startY > 3) ? endY - 2 : endY - 1;
 
     if (startX == endX) {
       // Straight vertical path — walk top-down, detouring around each obstacle

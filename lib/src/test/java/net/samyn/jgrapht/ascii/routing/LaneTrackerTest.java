@@ -80,7 +80,8 @@ class LaneTrackerTest {
     var tracker = new LaneTracker();
     tracker.claim(3, 0, 10);
     tracker.claim(4, 0, 10);
-    assertEquals(5, tracker.findFreeRow(3, 6, 0, 10));
+    // Row 5 is adjacent to claimed row 4 — spacing pushes to row 6
+    assertEquals(6, tracker.findFreeRow(3, 8, 0, 10));
   }
 
   @Test
@@ -99,6 +100,48 @@ class LaneTrackerTest {
     tracker.claim(5, 0, 10);
     // All rows 3-5 occupied, maxY is 5 — returns candidate (3) as fallback
     assertEquals(3, tracker.findFreeRow(3, 5, 0, 10));
+  }
+
+  @Test
+  void findFreeRowSkipsRowAdjacentToClaimedRow() {
+    var tracker = new LaneTracker();
+    tracker.claim(3, 0, 10);
+    // Row 4 is free but adjacent to claimed row 3 — should skip to row 5
+    assertEquals(5, tracker.findFreeRow(4, 8, 0, 10));
+  }
+
+  @Test
+  void findFreeRowEnforcesGapBetweenConsecutiveClaims() {
+    var tracker = new LaneTracker();
+    tracker.claim(3, 0, 10);
+    // First free row with gap: row 5 (row 4 is adjacent to 3)
+    int row1 = tracker.findFreeRow(3, 10, 0, 10);
+    assertEquals(5, row1);
+    tracker.claim(row1, 0, 10);
+    // Next free row with gap: row 7 (row 6 is adjacent to 5)
+    int row2 = tracker.findFreeRow(3, 10, 0, 10);
+    assertEquals(7, row2);
+  }
+
+  @Test
+  void findFreeRowFallsBackToUnspacedRowWhenFull() {
+    var tracker = new LaneTracker();
+    tracker.claim(3, 0, 10);
+    tracker.claim(5, 0, 10);
+    // Rows 3,5 claimed. With spacing: row 4 adj to 3 and 5, row 6 adj to 5, row 7 is free.
+    // But if maxY is 6, spacing can't be satisfied — fallback to row 7? No, maxY=6.
+    // Row 4: adj to 3 and 5. Row 6: adj to 5. All spaced options exhausted.
+    // Fallback pass: row 4 is free (unoccupied), so return 4.
+    assertEquals(4, tracker.findFreeRow(3, 6, 0, 10));
+  }
+
+  @Test
+  void findFreeRowSpacingOnlyAppliesToOverlappingXRange() {
+    var tracker = new LaneTracker();
+    tracker.claim(3, 0, 5);
+    // Row 4 in x-range [7, 12] — no overlap with claim at row 3 [0, 5]
+    // So adjacency check also passes (different x-range)
+    assertEquals(4, tracker.findFreeRow(4, 8, 7, 12));
   }
 
   @Test
