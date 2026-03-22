@@ -13,7 +13,7 @@ import net.samyn.jgrapht.ascii.model.GridVertex;
  */
 class ObstacleDetector<V> {
 
-  private static final int BOX_HEIGHT = 3;
+  private static final int BOX_HEIGHT = GridVertex.BOX_HEIGHT;
 
   private final List<GridVertex<V>> obstacles;
 

@@ -2,6 +2,7 @@ package net.samyn.jgrapht.ascii.render;
 
 import java.util.List;
 import net.samyn.jgrapht.ascii.model.Canvas;
+import net.samyn.jgrapht.ascii.model.DisplayWidth;
 import net.samyn.jgrapht.ascii.model.GridEdge;
 import net.samyn.jgrapht.ascii.model.GridVertex;
 
@@ -33,7 +34,7 @@ public class AsciiBoxRenderer implements CanvasRenderer {
     canvas.putChar(x, y + 1, '|');
     canvas.putChar(x + 1, y + 1, ' ');
     canvas.putString(x + 2, y + 1, vertex.label());
-    canvas.putChar(x + 2 + vertex.label().length(), y + 1, ' ');
+    canvas.putChar(x + 2 + DisplayWidth.width(vertex.label()), y + 1, ' ');
     canvas.putChar(x + innerWidth + 1, y + 1, '|');
 
     // Bottom border: +---+

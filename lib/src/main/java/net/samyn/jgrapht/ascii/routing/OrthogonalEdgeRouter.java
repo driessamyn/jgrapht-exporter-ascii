@@ -21,8 +21,7 @@ import org.jgrapht.Graph;
  */
 public class OrthogonalEdgeRouter implements EdgeRouter {
 
-  /** Height of a vertex box (top border + label row + bottom border). */
-  private static final int BOX_HEIGHT = 3;
+  private static final int BOX_HEIGHT = GridVertex.BOX_HEIGHT;
 
   @Override
   public <V> List<GridEdge<V>> routeEdges(
@@ -224,9 +223,11 @@ public class OrthogonalEdgeRouter implements EdgeRouter {
 
     int bendY = startY + 1;
 
-    // Check if horizontal segment at bendY collides with any obstacle, and push down if so
+    // Check if horizontal segment at bendY collides with any obstacle, and push down if so.
+    // Guard against infinite loops with a hard iteration ceiling.
+    int maxBendAttempts = adjustedEndY - startY + 1;
     List<GridVertex<V>> hCollisions = detector.findHorizontalCollisions(bendY, startX, endX);
-    while (!hCollisions.isEmpty()) {
+    for (int attempt = 0; !hCollisions.isEmpty() && attempt < maxBendAttempts; attempt++) {
       // Push bendY below the lowest colliding obstacle
       int maxObstBottom = 0;
       for (GridVertex<V> obst : hCollisions) {
@@ -248,7 +249,7 @@ public class OrthogonalEdgeRouter implements EdgeRouter {
     int maxBendX = Math.max(startX, endX);
     bendY = laneTracker.findFreeRow(bendY, adjustedEndY, minBendX, maxBendX);
     List<GridVertex<V>> postLaneCollisions = detector.findHorizontalCollisions(bendY, startX, endX);
-    while (!postLaneCollisions.isEmpty()) {
+    for (int attempt = 0; !postLaneCollisions.isEmpty() && attempt < maxBendAttempts; attempt++) {
       int maxObstBottom = 0;
       for (GridVertex<V> obst : postLaneCollisions) {
         maxObstBottom = Math.max(maxObstBottom, obst.y() + BOX_HEIGHT);

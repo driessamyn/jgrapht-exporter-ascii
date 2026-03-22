@@ -149,6 +149,11 @@ public class CrossingMinimiser<V, E> {
       fixedPositions.put(fixedLayer.get(i), i);
     }
 
+    Map<V, Integer> freePositions = new HashMap<>();
+    for (int i = 0; i < freeLayer.size(); i++) {
+      freePositions.put(freeLayer.get(i), i);
+    }
+
     Map<V, Double> barycentres = new HashMap<>();
     for (V vertex : freeLayer) {
       List<Integer> neighbourPositions = new ArrayList<>();
@@ -173,7 +178,7 @@ public class CrossingMinimiser<V, E> {
 
       if (neighbourPositions.isEmpty()) {
         // No neighbours in fixed layer — keep current position
-        barycentres.put(vertex, (double) freeLayer.indexOf(vertex));
+        barycentres.put(vertex, (double) freePositions.get(vertex));
       } else {
         double avg = neighbourPositions.stream().mapToInt(i -> i).average().orElse(0);
         barycentres.put(vertex, avg);
